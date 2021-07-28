@@ -1,0 +1,206 @@
+//Import Icon scss
+@import "./assets/scss/icons.scss";
+
+//import Light Theme
+@import "./assets/scss/bootstrap.scss";
+@import "./assets/scss/app.scss";
+
+//Import Dark theme
+// @import "./assets/scss/bootstrap-dark.scss";
+// @import "./assets/scss/app-dark.scss";
+
+// RTL mode
+// @import "./assets/scss/bootstrap.scss";
+// @import "./assets/scss/app-rtl.scss";
+
+.accordian-bg-products {
+  background-color: $gray-300;
+}
+
+.nav-link {
+  cursor: pointer;
+}
+
+.dataTables_filter,
+.dataTables_paginate {
+  float: right;
+  .pagination {
+    .page-link {
+      border-radius: 30px !important;
+      margin: 0 3px;
+      border: none;
+      text-align: center;
+      cursor: pointer;
+    }
+  }
+}
+
+.rdw-editor-main {
+  border: 1px solid $gray-300;
+  height: 239px;
+}
+.dz-message {
+  text-align: center;
+  padding: 100px;
+}
+
+.react-datepicker-wrapper {
+  width: 100% !important;
+}
+
+.ReactModal__Overlay {
+  z-index: 1001 !important;
+}
+
+.rangeslider__fill {
+  background-color: $primary !important;
+}
+
+.react-bootstrap-table {
+  padding-top: 0px !important;
+}
+
+.square-switch {
+  .react-switch-bg {
+    border-radius: 5px !important;
+  }
+}
+
+input[type="range"] {
+  -webkit-appearance: auto !important;
+}
+
+.chat-conversation-height {
+  min-height: 500px;
+}
+
+.expand-cell {
+  cursor: pointer !important;
+}
+
+.card {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  word-wrap: break-word !important;
+  background-color: #fff !important;
+  background-clip: border-box !important;
+  border: 0 solid #f1f5f7 !important;
+  border-radius: 0.25rem !important;
+}
+
+body {
+  margin: 0;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #505d69;
+  text-align: left;
+  background-color: #f1f5f7;
+}
+
+.table .thead-light th {
+  color: #505d69;
+  background-color: #f8f9fa;
+  border-color: #eff2f7;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #eff2f7 !important;
+}
+
+.float-right {
+  float: right !important;
+}
+
+.custom-select {
+  display: inline-block;
+  width: 100%;
+  height: calc(1.5em + 0.94rem + 2px);
+  padding: 0.47rem 1.75rem 0.47rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #505d69;
+  vertical-align: middle;
+  background: #fff
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e")
+    no-repeat right 0.75rem center/8px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.custom-control-label::before,
+.custom-file-label,
+.custom-select {
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+
+.custom-select-sm {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  font-size: 0.7875rem;
+}
+
+.media {
+  display: flex;
+  align-items: flex-start;
+}
+
+.media-body {
+  flex: 1 1;
+}
+
+//incoive table
+.invoice-table th:last-child,
+.invoice-table td:last-child {
+  text-align: right;
+}
+
+
+.full-dropdown {
+    width: 100%;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 100%;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.badge-soft-success {
+    color: #1cbb8c;
+    background-color: rgba(28, 187, 140, 0.18);
+}
+
+.badge-soft-warning {
+    color: #fcb92c;
+    background-color: rgba(252, 185, 44, 0.18);
+}
+
+.selected {
+  color: white !important;
+  i{
+    color: white !important;
+  }
+}
+
+.bg-gami{
+  background-color: #16CB8D;
+}
