@@ -9,6 +9,7 @@ import adminRoutes from './routes/admin_route.js';
 import managerRoutes from './routes/manager_route.js';
 import taskRoutes from './routes/tasks_route.js';
 import empsalaryRoutes from './routes/empsalary_route.js';
+import leavereq from './routes/leavereq_route.js';
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/admin', adminRoutes);
 app.use('/manager', managerRoutes);
 app.use('/tasks', taskRoutes);
 app.use('/empsalary', empsalaryRoutes);
+app.use('/leavereq', leavereq);
 
 
 

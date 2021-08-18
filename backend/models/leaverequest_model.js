@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
+var Schema = mongoose.Schema;
 
 const leavereqSchema = mongoose.Schema({
     employee_id: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId, ref: 'employees', required: true
     },
     department: {
         type: String,
@@ -13,8 +13,7 @@ const leavereqSchema = mongoose.Schema({
         type: String
     },
     approved_manager: {
-        type: Number,
-        required: true
+        type: Schema.Types.ObjectId, ref: 'managers', required: true
     },
     status: {
         type: String,
@@ -25,6 +24,9 @@ const leavereqSchema = mongoose.Schema({
         default: Date.now()
     },
     created_at: {
+        type: Date, default: Date.now()
+    },
+    updated_at: {
         type: Date, default: Date.now()
     }
 })
