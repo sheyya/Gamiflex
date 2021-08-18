@@ -58,15 +58,24 @@ export function AuthProvider({
     function loginAdmin(email, password) {
         setLoading(true);
 
-        Admin.userSignIn(email, password)
+        const login = Admin.userSignIn(email, password)
             .then((userdata) => {
                 console.log(userdata);
+                if (!isNaN(userdata)) {
+                    return userdata
 
-                setUser(userdata);
-                history.push("/dashboard/overview");
+                }
+                else {
+                    setUser(userdata);
+                    console.log(user);
+
+                    history.push("/dashboard/overview");
+                }
+
             })
             .catch((error) => setError(error))
             .finally(() => setLoading(false));
+        return login
     }
 
 

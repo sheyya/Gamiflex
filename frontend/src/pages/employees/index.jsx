@@ -27,17 +27,17 @@ import {
     DropdownItem,
 } from "reactstrap";
 import "./users.scss";
+import moment from "moment"
 import { Link, RouteComponentProps, useLocation } from "react-router-dom";
 import classnames from "classnames";
-import { deleteCustomer, getAllCustomers } from "../../controllers/customers";
-import { createCustomers } from "../../controllers/customers";
+import Admin from "../../controllers/admin";
 import { MainTable } from "../../components/MainTable";
-import { DeleteButton, EditButton } from "../../components/Buttons";
+import { DeleteButton, EditButton, VieweButton } from "../../components/Buttons";
 import { message, Modal as DelModal } from "antd";
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 
-export const Customers = (props) => {
+export const Employees = (props) => {
     const [activeTabProgress, setActiveTabProgress] = useState(1);
     const [progressValue, setProgressValue] = useState(25);
     const [modal_static, setModal_static] = useState(false);
@@ -80,16 +80,31 @@ export const Customers = (props) => {
 
     //get user input data
     const [userState, setUserState] = useState({
-        firstName: "",
-        lastName: "",
+        username: "",
+        pass: "",
+        cpass: "",
+        password: "",
+        fname: "",
+        lname: "",
         email: "",
-        phone: "",
+        address: "",
+        department: "",
+        nic: "",
+        contact_num: "",
+        marital_status: "",
+        gender: "",
+        fingerprint: "",
+        nominee: "",
+        member_id: "",
+        role: "employee"
 
     })
 
     //handle input changes
     const handleChange = (e) => {
         const value = e.target.value;
+        console.log(value);
+
         setUserState({
             ...userState,
             [e.target.name]: value
@@ -102,11 +117,11 @@ export const Customers = (props) => {
         switch (tabval) {
             // user not found
             case 1:
-                if (userState.email && userState.firstName && userState.lastName && userState.phone) {
+                if (userState.email && userState.fname && userState.lname && userState.contact_num) {
                     const patternEmail = /[a-zA-Z0-9]+[\.]?([a-zA-Z0-9]+)?[\@][a-z]{3,9}[\.][a-z]{2,5}/g;
                     const patternPhone = /([0-9\s\-]{7,})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/;
                     const resultEmail = patternEmail.test(userState.email);
-                    const resultPhone = patternPhone.test(userState.phone);
+                    const resultPhone = patternPhone.test(userState.contact_num);
                     if (resultPhone && resultEmail) {
                         setisvalid(true)
                         toggleTabProgress(activeTabProgress + 1);
@@ -125,6 +140,7 @@ export const Customers = (props) => {
     const location = useLocation();
 
     useEffect(() => {
+        console.log("hi");
 
         let urldata = window.location.pathname.split("/");
         let userid = urldata[urldata.length - 1];
@@ -133,7 +149,7 @@ export const Customers = (props) => {
         if (urldata[urldata.length - 2] === "delete") {
             showDeleteConfirm(userid);
         } else {
-            loadAllCustomers(null)
+            loadAllEmployees(null)
         }
 
     }, [location]);
@@ -142,6 +158,7 @@ export const Customers = (props) => {
 
     const { confirm } = DelModal;
     function showDeleteConfirm(data) {
+
         confirm({
             title: 'Are you sure delete this?',
             icon: <ExclamationCircleOutlined />,
@@ -150,22 +167,22 @@ export const Customers = (props) => {
             okType: 'danger',
             cancelText: 'No',
             onOk() {
-                deleteCustomers(data)
+                deleteEmployees(data)
             },
             onCancel() {
-                props.history.push('/dashboard/customers')
+                props.history.push('/dashboard/employees')
             },
         });
     }
     // loading message key
     const key = 'loading';
 
-    const deleteCustomers = (params) => {
+    const deleteEmployees = (params) => {
         message.loading({ content: 'Deleting...', key, duration: 0 })
-        deleteCustomer(params)
+        Admin.deleteEmployee(params)
             .then((result) => {
                 message.success({ content: 'Deleted!', key, duration: 1 }).then(() => {
-                    props.history.push('/dashboard/customers')
+                    props.history.push('/dashboard/employees')
                 })
 
             })
@@ -175,22 +192,26 @@ export const Customers = (props) => {
     };
 
 
-    //getall customers
-    const loadAllCustomers = (params) => {
+    //getall employees
+    const loadAllEmployees = (params) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
-        getAllCustomers(params)
+        Admin.getAllEmployees(params)
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
-                const data = result.data;
+                const rdata = result.data;
                 setMeta(result.meta)
-                setData(data.map((item) => {
+                setData(rdata.map((item) => {
+                    const date = moment(item.created_at).format('YYYY MMMM DD')
+                    console.log(date);
+
                     return (
                         {
-                            id: item.id,
-                            name: `${item.first_name} ${item.last_name}`,
-                            email: item.email,
-                            contactno: item.phone,
-                            invoiceRate: item.invoice_group_id
+                            id: item._id,
+                            name: `${item.fname} ${item.lname}`,
+                            member_id: item.member_id,
+                            contact_num: item.contact_num,
+                            joindate: date,
+                            department: item.department
                         }
                     )
                 }))
@@ -207,7 +228,7 @@ export const Customers = (props) => {
             <div className="page-content">
                 <Container fluid>
                     <div className="page-title-box">
-                        <h4 className="mb-0">Users</h4>
+                        <h4 className="mb-0">Employees</h4>
                     </div>
 
                     <Row>
@@ -221,28 +242,25 @@ export const Customers = (props) => {
                                 className="waves-effect waves-light mb-3 bg-table-blue" style={{ border: 'none' }}
                             >
                                 <i className="ri-user-add-line align-middle"></i>
-                                <span className="mx-2">Add Customer</span>
+                                <span className="mx-2">Add Employee</span>
                             </Button>
                             <Card>
                                 <CardBody>
                                     <MainTable
                                         meta={meta}
                                         data={data}
-                                        handlePageChange={loadAllCustomers}
+                                        handlePageChange={loadAllEmployees}
                                         columns={[
                                             { label: "Name", field: "name" },
-                                            { label: "Email", field: "email" },
-                                            {
-                                                label: "Contact Number",
-                                                field: "contactno",
-                                            }, {
-                                                label: "Invoice Group",
-                                                field: "invoiceRate",
-                                            },
+                                            { label: "Employee ID", field: "member_id" },
+                                            { label: "Phone", field: "contact_num" },
+                                            { label: "Joined Date", field: "joindate" },
+                                            { label: "Department", field: "department" },
                                         ]}
                                         actions={[
-                                            { button: <EditButton />, path: "/dashboard/customer/edit/" },
-                                            { button: <DeleteButton />, path: "customers/delete/" },
+                                            { button: <VieweButton />, path: "/dashboard/employee/view/" },
+                                            { button: <EditButton />, path: "/dashboard/employee/edit/" },
+                                            { button: <DeleteButton />, path: "employees/delete/" },
                                         ]}
                                     />
                                 </CardBody>
@@ -261,7 +279,7 @@ export const Customers = (props) => {
                                 setModal_static(false);
                             }}
                         >
-                            Add Customer Details
+                            Add Employee Details
                         </ModalHeader>
                         <ModalBody>
                             <Alert
@@ -298,7 +316,7 @@ export const Customers = (props) => {
                                             }}
                                         >
                                             <span className="step-number">02</span>
-                                            <span className="step-title">Billing Details</span>
+                                            <span className="step-title">Work Details</span>
                                         </NavLink>
                                     </NavItem>
                                     <NavItem>
@@ -311,7 +329,7 @@ export const Customers = (props) => {
                                             }}
                                         >
                                             <span className="step-number">03</span>
-                                            <span className="step-title">Wallet Details</span>
+                                            <span className="step-title">Personal Details</span>
                                         </NavLink>
                                     </NavItem>
                                     <NavItem>
@@ -346,13 +364,13 @@ export const Customers = (props) => {
                                             <Row>
                                                 <Col lg="6">
                                                     <FormGroup>
-                                                        <Label for="customer-firstname">First name</Label>
+                                                        <Label for="employee-firstname">First name</Label>
                                                         <AvField
                                                             type="text"
                                                             className="form-control"
-                                                            id="customer-firstname"
-                                                            name="firstName"
-                                                            value={userState.firstName}
+                                                            id="employee-firstname"
+                                                            name="fname"
+                                                            value={userState.fname}
                                                             validate={{ required: { value: true, errorMessage: 'Please enter a first name' } }}
                                                             onChange={handleChange}
                                                         />
@@ -360,13 +378,13 @@ export const Customers = (props) => {
                                                 </Col>
                                                 <Col lg="6">
                                                     <FormGroup>
-                                                        <Label for="customer-lastname">Last name</Label>
+                                                        <Label for="employee-lastname">Last name</Label>
                                                         <AvField
                                                             type="text"
                                                             className="form-control"
-                                                            id="customer-lastname"
-                                                            name="lastName"
-                                                            value={userState.lastName}
+                                                            id="employee-lastname"
+                                                            name="lname"
+                                                            value={userState.lname}
                                                             onChange={handleChange}
                                                             validate={{ required: { value: true, errorMessage: 'Please enter a last name' } }}
                                                         />
@@ -377,13 +395,13 @@ export const Customers = (props) => {
                                             <Row>
                                                 <Col lg="6">
                                                     <FormGroup>
-                                                        <Label for="customer-phoneno">Phone</Label>
+                                                        <Label for="employee-phoneno">Phone</Label>
                                                         <AvField
                                                             type="text"
                                                             className="form-control"
-                                                            id="customer-phoneno"
-                                                            name="phone"
-                                                            value={userState.phone}
+                                                            id="employee-phoneno"
+                                                            name="contact_num"
+                                                            value={userState.contact_num}
                                                             onChange={handleChange}
                                                             validate={{ pattern: { value: /([0-9\s\-]{7,})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/ }, required: { value: true, errorMessage: 'Please enter a phone number' } }}
                                                         />
@@ -391,11 +409,11 @@ export const Customers = (props) => {
                                                 </Col>
                                                 <Col lg="6">
                                                     <FormGroup>
-                                                        <Label for="customer-email">Email</Label>
+                                                        <Label for="employee-email">Email</Label>
                                                         <AvField
                                                             type="email"
                                                             className="form-control"
-                                                            id="customer-email"
+                                                            id="employee-email"
                                                             name="email"
                                                             validate={{ email: true, required: { value: true, errorMessage: 'Please enter a email address' } }}
                                                             value={userState.email}
@@ -407,14 +425,16 @@ export const Customers = (props) => {
                                             <Row>
                                                 <Col lg="12">
                                                     <FormGroup>
-                                                        <Label for="customer-address">Address</Label>
+                                                        <Label for="employee-address">Address</Label>
                                                         <AvInput
                                                             type="textarea"
                                                             name="address"
-                                                            id="customer-address"
+                                                            id="employee-address"
                                                             className="form-control"
                                                             rows={2}
-                                                            disabled={true}
+                                                            validate={{ required: { value: true, errorMessage: 'Please enter an address' } }}
+                                                            value={userState.address}
+                                                            onChange={handleChange}
                                                         ></AvInput>
                                                     </FormGroup>
                                                 </Col>
@@ -427,32 +447,34 @@ export const Customers = (props) => {
                                                 <Row>
                                                     <Col lg="6">
                                                         <FormGroup>
-                                                            <Label for="billing-name">Billing Name</Label>
+                                                            <Label for="employeeid">Employee ID</Label>
                                                             <Input
                                                                 type="text"
                                                                 className="form-control"
                                                                 // defaultValue={`${userState.firstName} ${userState.lastName}`}
-                                                                defaultValue={userState.firstName}
+                                                                value={userState.member_id}
                                                                 onChange={handleChange}
-                                                                id="billing-name"
-                                                                name="billing-name"
+                                                                validate={{ required: { value: true, errorMessage: 'Please enter an ID' } }}
+                                                                id="employeeid"
+                                                                name="member_id"
                                                             />
                                                         </FormGroup>
                                                     </Col>
                                                     <Col lg="6">
                                                         <FormGroup>
-                                                            <Label for="billing-lastname">Invoice Rate</Label>
+                                                            <Label for="department">Department</Label>
                                                             <Dropdown
                                                                 isOpen={dropdownOpen}
-                                                                disabled={true}
                                                                 toggle={toggleDropdown}
                                                             >
                                                                 <DropdownToggle className="full-dropdown" caret color="light">
-                                                                    Select Rate
+                                                                    {userState.department}
                                                                 </DropdownToggle>
                                                                 <DropdownMenu className="full-dropdown" >
-                                                                    <DropdownItem>Lorem</DropdownItem>
-                                                                    <DropdownItem>Ipsum</DropdownItem>
+                                                                    <DropdownItem name="department" value="Cutting" onClick={handleChange}>Cutting</DropdownItem>
+                                                                    <DropdownItem name="department" value="Packing" onClick={handleChange}>Packing</DropdownItem>
+                                                                    <DropdownItem name="department" value="Sewing" onClick={handleChange}>Sewing</DropdownItem>
+                                                                    <DropdownItem name="department" value="Quality Checking" onClick={handleChange}>Quality Checking</DropdownItem>
                                                                 </DropdownMenu>
                                                             </Dropdown>
                                                         </FormGroup>
@@ -461,17 +483,66 @@ export const Customers = (props) => {
                                                 <Row>
                                                     <Col lg="12">
                                                         <FormGroup>
-                                                            <Label for="billing-email">Billing Email</Label>
+                                                            <Label for="username">Username</Label>
                                                             <Input
-                                                                type="email"
+                                                                type="text"
                                                                 className="form-control"
-                                                                defaultValue={userState.email}
+                                                                defaultValue={userState.username}
                                                                 onChange={handleChange}
-                                                                id="billing-email"
+                                                                id="username"
+                                                                name="username"
                                                             />
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
+                                                <AvForm>
+                                                    <Row>
+                                                        <Col lg="6">
+                                                            <Label for="password">Password</Label>
+                                                            <AvField
+                                                                type="password"
+                                                                className="form-control"
+                                                                defaultValue={userState.pass}
+                                                                onChange={handleChange}
+                                                                id="password"
+                                                                name="pass"
+                                                                validate={{
+                                                                    required: {
+                                                                        value: true,
+                                                                        errorMessage: 'Enter a new password'
+                                                                    },
+                                                                    minLength: {
+                                                                        value: 6,
+                                                                        errorMessage: '6 characters minimum'
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </Col>
+                                                        <Col lg="6">
+                                                            <Label for="confirm-password">Confirm Password</Label>
+                                                            <AvField
+                                                                type="password"
+                                                                className="form-control"
+                                                                defaultValue={userState.cpass}
+                                                                onChange={handleChange}
+                                                                name="cpass"
+                                                                id="confirm-password"
+                                                                validate={{
+                                                                    match: {
+                                                                        value: 'pass',
+                                                                        errorMessage: "Password doesn't match"
+                                                                    },
+                                                                    required: {
+                                                                        value: true,
+                                                                        errorMessage: 'Enter your new password'
+                                                                    }
+                                                                }}
+                                                            />
+
+                                                        </Col>
+
+                                                    </Row>
+                                                </AvForm>
                                             </Form>
                                         </div>
                                     </TabPane>
@@ -483,62 +554,73 @@ export const Customers = (props) => {
                                                         <Row>
                                                             <Col lg="6">
                                                                 <FormGroup>
-
-                                                                    <Label for="wallet-email">Assign Wallet</Label>
-                                                                    {/* <Input
-                                type="text"
-                                className="form-control"
-                                id="wallet-email"
-                              /> */}
-                                                                    <Dropdown
-                                                                        isOpen={dropdownOpenWallet}
-                                                                        disabled={true}
-                                                                        toggle={toggleDropdownWallet}
-                                                                    >
-                                                                        <DropdownToggle className="full-dropdown" caret color="light">
-                                                                            Select Wallet
-                                                                        </DropdownToggle>
-                                                                        <DropdownMenu className="full-dropdown" >
-                                                                            <DropdownItem>Some Action</DropdownItem>
-                                                                            <DropdownItem>Quo Action</DropdownItem>
-                                                                        </DropdownMenu>
-                                                                    </Dropdown>
+                                                                    <Label for="nic">NIC</Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        className="form-control"
+                                                                        id="nic"
+                                                                        defaultValue={userState.nic}
+                                                                        onChange={handleChange}
+                                                                        name="nic"
+                                                                    />
                                                                 </FormGroup>
                                                             </Col>
                                                             <Col lg="6">
                                                                 <FormGroup>
-
-                                                                    <Label for="wallet-email"> Scheduling Group</Label>
-
-                                                                    <Dropdown
-                                                                        isOpen={dropdownOpenGroup}
-                                                                        disabled={true}
-                                                                        toggle={toggleDropdownGroup}
-                                                                    >
-                                                                        <DropdownToggle className="full-dropdown" caret color="light">
-                                                                            Select Group
-                                                                        </DropdownToggle>
-                                                                        <DropdownMenu className="full-dropdown" >
-                                                                            <DropdownItem>Lorem</DropdownItem>
-                                                                            <DropdownItem>Ipsum</DropdownItem>
-                                                                        </DropdownMenu>
-                                                                    </Dropdown>
+                                                                    <Label for="nominee">Nominee</Label>
+                                                                    <Input
+                                                                        type="text"
+                                                                        className="form-control"
+                                                                        id="nominee"
+                                                                        defaultValue={userState.nominee}
+                                                                        onChange={handleChange}
+                                                                        name="nominee"
+                                                                    />
                                                                 </FormGroup>
                                                             </Col>
                                                         </Row>
                                                         <Row>
                                                             <Col lg="6">
                                                                 <FormGroup>
-                                                                    <Label for="wallet-remark">Remark</Label>
-                                                                    <Input
-                                                                        type="text"
-                                                                        className="form-control"
-                                                                        disabled={true}
-                                                                        id="wallet-remark"
-                                                                    />
+
+                                                                    <Label for="marital_status">Marital Status</Label>
+                                                                    <Dropdown
+                                                                        isOpen={dropdownOpenWallet}
+                                                                        id="marital_status"
+                                                                        toggle={toggleDropdownWallet}
+                                                                    >
+                                                                        <DropdownToggle className="full-dropdown" caret color="light">
+                                                                            {userState.marital_status}
+                                                                        </DropdownToggle>
+                                                                        <DropdownMenu className="full-dropdown" >
+                                                                            <DropdownItem name="marital_status" value="Married" onClick={handleChange}>Married</DropdownItem>
+                                                                            <DropdownItem name="marital_status" value="Single" onClick={handleChange}>Single</DropdownItem>
+                                                                        </DropdownMenu>
+                                                                    </Dropdown>
+                                                                </FormGroup>
+                                                            </Col>
+                                                            <Col lg="6">
+                                                                <FormGroup>
+
+                                                                    <Label for="gender"> Gender</Label>
+
+                                                                    <Dropdown
+                                                                        isOpen={dropdownOpenGroup}
+                                                                        id="gender"
+                                                                        toggle={toggleDropdownGroup}
+                                                                    >
+                                                                        <DropdownToggle className="full-dropdown" caret color="light">
+                                                                            {userState.gender}
+                                                                        </DropdownToggle>
+                                                                        <DropdownMenu className="full-dropdown" >
+                                                                            <DropdownItem name="gender" value="Male" onClick={handleChange}>Male</DropdownItem>
+                                                                            <DropdownItem name="gender" value="Female" onClick={handleChange}>Female</DropdownItem>
+                                                                        </DropdownMenu>
+                                                                    </Dropdown>
                                                                 </FormGroup>
                                                             </Col>
                                                         </Row>
+
                                                     </Col>
                                                 </Row>
                                             </Form>
@@ -548,18 +630,20 @@ export const Customers = (props) => {
                                         <div className="row justify-content-center">
                                             <Row className="px-5 py-3">
                                                 <Col lg="6">
-                                                    <Row><Label className="d-inline-flex mb-2 "> First Name : <p className="mx-2 mb-0 fw-light">{userState.firstName}</p></Label></Row>
-                                                    <Row><Label className="d-inline-flex mb-2 "> Last Name : <p className="mx-2 mb-0 fw-light">{userState.lastName}</p></Label></Row>
-                                                    <Row><Label className="d-inline-flex mb-2 "> Assigned Wallte : &nbsp;<span className=" badge badge-light badge-sm bg-light text-xs py-1 px-2 text-dark border border-secondary">Empty</span></Label></Row>
-                                                    <Row><Label className="d-inline-flex mb-2 "> Scheduled Group : &nbsp;<span className=" badge badge-light badge-sm bg-light text-xs py-1 px-2 text-dark border border-secondary">Empty</span></Label></Row>
-                                                    <Row><Label className="d-inline-flex mb-2 "> Remark : &nbsp;<span className=" badge badge-light badge-sm bg-light text-xs py-1 px-2 text-dark border border-secondary">Empty</span></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> First Name : <p className="mx-2 mb-0 fw-light">{userState.fname}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Last Name : <p className="mx-2 mb-0 fw-light">{userState.lname}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Email : <p className="mx-2 mb-0 fw-light">{userState.email}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Phone : <p className="mx-2 mb-0 fw-light">{userState.contact_num}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Address : <p className="mx-2 mb-0 fw-light">{userState.address}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Gender : <p className="mx-2 mb-0 fw-light">{userState.gender}</p></Label></Row>
                                                 </Col>
                                                 <Col lg="6">
-                                                    <Row><Label className="d-inline-flex mb-2 "> Email : <p className="mx-2 mb-0 fw-light">{userState.email}</p></Label></Row>
-                                                    <Row><Label className="d-inline-flex mb-2 "> Phone Number : <p className="mx-2 mb-0 fw-light">{userState.phone}</p></Label></Row>
-                                                    <Row><Label className="d-inline-flex mb-2 "> Billing Name : &nbsp;<span className=" badge badge-light badge-sm bg-light text-xs py-1 px-2 text-dark border border-secondary">Empty</span></Label></Row>
-                                                    <Row><Label className="d-inline-flex mb-2 "> Billing Email : &nbsp;<span className=" badge badge-light badge-sm bg-light text-xs py-1 px-2 text-dark border border-secondary">Empty</span></Label></Row>
-                                                    <Row><Label className="d-inline-flex mb-2 "> Invoice Rate : &nbsp;<span className=" badge badge-light badge-sm bg-light text-xs py-1 px-2 text-dark border border-secondary">Empty</span></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Employee ID : <p className="mx-2 mb-0 fw-light">{userState.member_id}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Department: <p className="mx-2 mb-0 fw-light">{userState.department}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Username : <p className="mx-2 mb-0 fw-light">{userState.username}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> NIC : <p className="mx-2 mb-0 fw-light">{userState.nic}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Nominee : <p className="mx-2 mb-0 fw-light">{userState.nominee}</p></Label></Row>
+                                                    <Row><Label className="d-inline-flex mb-2 "> Marital Status : <p className="mx-2 mb-0 fw-light">{userState.marital_status}</p></Label></Row>
                                                 </Col>
                                                 {/* <Col lg="4">
                                                    
@@ -615,20 +699,32 @@ export const Customers = (props) => {
                                     >
                                         <Button
                                             onClick={() => {
-                                                createCustomers({ ...userState, first_name: userState.firstName, last_name: userState.lastName })
+                                                Admin.createEmployees(userState)
                                                     .then((result) => {
+                                                        console.log(result);
+                                                        Admin.createEmpSalary({ employee_id: result.data, month: moment().format('MMM YY') })
                                                         setIsAlertOpen(true);
-                                                        loadAllCustomers(null);
+                                                        loadAllEmployees(null);
                                                         setTimeout(() => {
                                                             setActiveTabProgress(1);
                                                             setProgressValue(25);
                                                             setModal_static(false);
                                                             setUserState({
-                                                                firstName: "",
-                                                                lastName: "",
+                                                                username: "",
+                                                                password: "",
+                                                                fname: "",
+                                                                lname: "",
                                                                 email: "",
-                                                                phone: "",
-
+                                                                address: "",
+                                                                department: "",
+                                                                nic: "",
+                                                                contact_num: "",
+                                                                marital_status: "",
+                                                                gender: "",
+                                                                fingerprint: "",
+                                                                nominee: "",
+                                                                member_id: "",
+                                                                role: "employee"
                                                             })
                                                         }, 2000);
                                                     })

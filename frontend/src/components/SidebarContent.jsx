@@ -84,74 +84,35 @@ export function SidebarContent(props) {
           <li>
             <NavLink
               activeClassName="selected"
-              to="/dashboard/customers"
+              to="/dashboard/employees"
               className=" waves-effect"
             >
               <i className="ri-account-circle-line"></i>
-              <span className="ml-1">Customers</span>
+              <span className="ml-1">Employees</span>
             </NavLink>
           </li>
 
           <li>
             <NavLink
               activeClassName="selected"
-              to="/dashboard/invoices"
+              to="/dashboard/managers"
               className=" waves-effect"
             >
-              <i className="mdi mdi-receipt"></i>
-              <span className="ml-1">Invoices</span>
+              <i className="mdi mdi-briefcase-account"></i>
+              <span className="ml-1">Managers</span>
             </NavLink>
           </li>
-
           <li>
             <NavLink
-              to="#"
-              onClick={toggle}
-              role="button"
-              aria-expanded="false"
-              aria-controls="collapseExample"
-              className="has-arrow waves-effect"
+              activeClassName="selected"
+              to="/dashboard/tasks"
+              className=" waves-effect"
             >
-              <i className="ri-settings-5-line"></i>
-
-              <span className="ml-1">Settings</span>
+              <i className="mdi mdi-card-bulleted-settings-outline"></i>
+              <span className="ml-1">Tasks</span>
             </NavLink>
-            <ul
-              className={
-                isOpen ? "sub-menu collapse.show sidebar_styles" : "sub-menu collapse"
-              }
-              id="collapseExample"
-            >
-              <li>
-                <NavLink
-                  onClick={() => {
-                    setIsOpen(true);
-                  }}
-                  activeClassName="selected"
-                  to="/settings/platform_users"
-                >
-                  <i className="ri-account-circle-fill"></i>Platform Users
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  activeClassName="selected"
-                  to="/settings/scheduling_groups"
-                >
-                  <i className="ri-alarm-line"></i>Scheduling Groups
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  activeClassName="selected"
-                  to="/settings/invoice_rate_groups"
-                >
-                  {" "}
-                  <i className="ri-bar-chart-fill"></i>Invoice Rate Groups
-                </NavLink>
-              </li>
-            </ul>
           </li>
+
           <li>
             <NavLink
               activeClassName="selected"

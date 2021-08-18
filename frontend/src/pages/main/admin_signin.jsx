@@ -43,11 +43,12 @@ const Admin_Signin = () => {
       usernameval,
       passval
     );
+    console.log(status);
 
     switch (status) {
 
       // user not found
-      case 400:
+      case 404:
         await setError(
           "Inavlid Username or Password"
         );
@@ -56,11 +57,6 @@ const Admin_Signin = () => {
       case 600:
         setError("Please check your network connection");
         return -1;
-      case true:
-        //success redirect
-        //  history.push('/dashboard/overview') 
-        window.location.replace('/dashboard/overview')
-        break;
     }
 
   }

@@ -150,7 +150,7 @@ export const createEmployee = async (req, res) => {
             password
         });
 
-        await newEmployee.save(function (err) {
+        await newEmployee.save(function (err, emp) {
             if (err) {
                 console.log(err);
                 res.status(600).json({
@@ -162,7 +162,8 @@ export const createEmployee = async (req, res) => {
 
             res.status(201).json({
                 message: "Employee successfully registred!",
-                success: true
+                success: true,
+                data: emp._id
             });
             return
         });
@@ -199,10 +200,12 @@ export const getEmployees = function (req, res, next) {
 };
 
 // update manager
-export const updateEmployee = (req, res, next) => {
-
-    let query = { _id: req.body.id }
-
+export const updateEmployee = async (req, res, next) => {
+    let pass;
+    let query = { _id: req.params.id }
+    if (req.body.username) {
+        pass = await bcrypt.hash(req.body.password, 12);
+    }
     Employee.findOne(query).exec().then(found_employee => {
         if (found_employee < 1) {
             return res.status(402).json({
@@ -211,7 +214,7 @@ export const updateEmployee = (req, res, next) => {
         } else {
 
             if (req.body.username) { found_employee.username = req.body.username }
-            if (req.body.password) { found_employee.password = req.body.password }
+            if (req.body.password) { found_employee.password = pass }
             if (req.body.fname) { found_employee.fname = req.body.fname }
             if (req.body.lname) { found_employee.lname = req.body.lname }
             if (req.body.email) { found_employee.email = req.body.email }
@@ -252,7 +255,7 @@ export const updateEmployee = (req, res, next) => {
 //get employee by id
 export const getEmployeeByid = (req, res, next) => {
 
-    let query = { _id: req.body.id }
+    let query = { _id: req.params.id }
 
     Employee.findOne(query).exec().then(employee => {
         if (employee < 1) {
@@ -278,7 +281,7 @@ export const getEmployeeByid = (req, res, next) => {
 //delete employee
 export const deleteEmployee = (req, res, next) => {
 
-    let query = { _id: req.body.id }
+    let query = { _id: req.params.id }
 
     Employee.findOne(query).exec().then(found_employee => {
         if (found_employee < 1) {
@@ -387,10 +390,12 @@ export const getManagers = function (req, res, next) {
 };
 
 // update manager
-export const updateManager = (req, res, next) => {
-
-    let query = { _id: req.body.id }
-
+export const updateManager = async (req, res, next) => {
+    let pass;
+    let query = { _id: req.params.id }
+    if (req.body.username) {
+        pass = await bcrypt.hash(req.body.password, 12);
+    }
     Manager.findOne(query).exec().then(found_manager => {
         if (found_manager < 1) {
             return res.status(402).json({
@@ -399,7 +404,7 @@ export const updateManager = (req, res, next) => {
         } else {
 
             if (req.body.username) { found_manager.username = req.body.username }
-            if (req.body.password) { found_manager.password = req.body.password }
+            if (req.body.password) { found_manager.password = pass }
             if (req.body.fname) { found_manager.fname = req.body.fname }
             if (req.body.lname) { found_manager.lname = req.body.lname }
             if (req.body.email) { found_manager.email = req.body.email }
@@ -440,7 +445,7 @@ export const updateManager = (req, res, next) => {
 //get managers by id
 export const getManagerByid = (req, res, next) => {
 
-    let query = { _id: req.body.id }
+    let query = { _id: req.params.id }
 
     Manager.findOne(query).exec().then(manager => {
         if (manager < 1) {
@@ -467,7 +472,7 @@ export const getManagerByid = (req, res, next) => {
 //delete employee
 export const deleteManager = (req, res, next) => {
 
-    let query = { _id: req.body.id }
+    let query = { _id: req.params.id }
 
     Manager.findOne(query).exec().then(found_manager => {
         if (found_manager < 1) {

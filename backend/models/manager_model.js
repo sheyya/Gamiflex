@@ -45,7 +45,6 @@ const managerSchema = mongoose.Schema({
     },
     fingerprint: {
         type: String,
-        required: true
     },
     nominee: {
         type: String,

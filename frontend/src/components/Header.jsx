@@ -9,6 +9,7 @@ import logodark from "../assets/images/logo-dark.png";
 import logosmlight from "../assets/images/logo-sm-light.png";
 import logolight from "../assets/images/logo-light.png";
 import useAuth from "../useAuth";
+import jwt from 'jwt-decode'
 
 const toggleMenu = () => {
   document.body.classList.toggle("sidebar-enable");
@@ -16,9 +17,7 @@ const toggleMenu = () => {
 };
 
 export function Header(props) {
-  const { user } = useAuth();
-  console.log(user);
-
+  const userdata = localStorage.getItem('usertoken');
   return (
     <React.Fragment>
       <header id="page-topbar">
@@ -58,7 +57,7 @@ export function Header(props) {
               <p className="mx-2 my-auto">
                 <b style={{ fontFamily: "sans-serif" }}>Welcome,</b>
               </p>
-              <p className="my-auto">{user.username}</p>
+              <p className="my-auto">{jwt(userdata).username}</p>
             </div>
           </div>
         </div>

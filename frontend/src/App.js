@@ -7,7 +7,7 @@ import { AuthProvider } from "./useAuth";
 
 // Import scss
 import "./theme.scss";
-
+import 'antd/dist/antd.css';
 const App = () => {
     return (
         <BrowserRouter>

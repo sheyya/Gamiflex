@@ -36,16 +36,16 @@ router.post('/reg_admin', userAuth, checkRole(["admin"]), adminController.adminR
 
 //===========users===========
 router.get('/emp', userAuth, checkRole(["admin"]), adminController.getEmployees);
-router.post('/create_emp', userAuth, checkRole(["admin"]), adminController.createEmployee);
-router.get('/empid', userAuth, checkRole(["admin"]), adminController.getEmployeeByid);
-router.patch('/empupdate', userAuth, checkRole(["admin"]), adminController.updateEmployee);
-router.delete('/empdel', userAuth, checkRole(["admin"]), adminController.deleteEmployee);
+router.post('/emp', userAuth, checkRole(["admin"]), adminController.createEmployee);
+router.get('/emp/:id', userAuth, checkRole(["admin"]), adminController.getEmployeeByid);
+router.patch('/emp/:id', userAuth, checkRole(["admin"]), adminController.updateEmployee);
+router.delete('/emp/:id', userAuth, checkRole(["admin"]), adminController.deleteEmployee);
 
 //=========managers===========
 router.get('/mngr', userAuth, checkRole(["admin"]), adminController.getManagers);
-router.post('/create_mngr', userAuth, checkRole(["admin"]), adminController.createManager);
-router.get('/mngrid', userAuth, checkRole(["admin"]), adminController.getManagerByid);
-router.patch('/mngrupdate', userAuth, checkRole(["admin"]), adminController.updateManager);
-router.delete('/mngrdel', userAuth, checkRole(["admin"]), adminController.deleteManager);
+router.post('/mngr', userAuth, checkRole(["admin"]), adminController.createManager);
+router.get('/mngr/:id', userAuth, checkRole(["admin"]), adminController.getManagerByid);
+router.patch('/mngr/:id', userAuth, checkRole(["admin"]), adminController.updateManager);
+router.delete('/mngr/:id', userAuth, checkRole(["admin"]), adminController.deleteManager);
 
 export default router;

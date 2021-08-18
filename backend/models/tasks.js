@@ -1,34 +1,42 @@
 import mongoose from 'mongoose';
+var Schema = mongoose.Schema;
 
 const tasksSchema = mongoose.Schema({
-    username: {
+    task_type: {
+        type: Schema.Types.ObjectId, ref: 'tasks_types', required: true
+    },
+    department: {
         type: String,
         required: true
     },
-    fname: {
-        type: String,
+    assignee: {
+        type: Schema.Types.ObjectId, ref: 'employees', required: true
+    },
+    manager: {
+        type: Schema.Types.ObjectId, ref: 'managers', required: true
+    },
+    target: {
+        type: Number,
         required: true
     },
-    lname: {
-        type: String
+    status: {
+        type: String,
+        default: "ongoing",
     },
-    email: {
+    completed: {
+        type: Number,
+        default: 0
+    },
+    updated_at: {
+        type: Date,
+        default: Date.now()
+    },
+    deadline: {
         type: String,
         required: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    profilepic: {
-        type: String
     },
     created_at: {
         type: Date, default: Date.now()
-    },
-    role: {
-        type: String,
-        default: "admin"
     }
 })
 

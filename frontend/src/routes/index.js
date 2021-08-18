@@ -10,9 +10,12 @@ import Employee_Signin from "../pages/main/employee_signin";
 
 //Other Pages
 // import { Overview } from "../pages/overview/index";
-// import { Invoices } from "../pages/invoices/index";
-// import { Customers } from "../pages/customers/index";
-// import Customer from "../pages/customers/customer";
+import { Employees } from "../pages/employees/index";
+import Employee from "../pages/employees/view_employee";
+import { Managers } from "../pages/managers/index";
+import Manager from "../pages/managers/view_manager";
+import { Tasks } from "../pages/tasks/index";
+import Task from "../pages/tasks/view_task";
 // import AddCustomer from "../pages/customers/addUser";
 // import Settings from "../pages/settings/index";
 
@@ -28,9 +31,12 @@ const routes = [
   //   component: Overview,
   //   isAuth: true,
   // },
-  // { path: "/dashboard/customers", exact: true, component: Customers, isAuth: true },
-  // { path: "/dashboard/customer", exact: true, component: Customer, isAuth: true },
-  // { path: "/dashboard/addcustomer", exact: true, component: AddCustomer, isAuth: true },
+  { path: "/dashboard/employees", exact: true, component: Employees, isAuth: true },
+  { path: "/dashboard/employee", exact: true, component: Employee, isAuth: true },
+  { path: "/dashboard/managers", exact: true, component: Managers, isAuth: true },
+  { path: "/dashboard/manager", exact: true, component: Manager, isAuth: true },
+  { path: "/dashboard/tasks", exact: true, component: Tasks, isAuth: true },
+  { path: "/dashboard/task", exact: true, component: Task, isAuth: true },
   // {
   //   path: "/dashboard/invoices",
   //   exact: true,
