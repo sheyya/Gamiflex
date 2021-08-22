@@ -55,10 +55,10 @@ export function AuthProvider({
     //
     // Finally, just signal the component that loading the
     // loading state is over.
-    function loginAdmin(email, password) {
+    function loginUser(role, email, password) {
         setLoading(true);
 
-        const login = Admin.userSignIn(email, password)
+        const login = role.userSignIn(email, password)
             .then((userdata) => {
                 console.log(userdata);
                 if (!isNaN(userdata)) {
@@ -82,7 +82,7 @@ export function AuthProvider({
 
     // Call the logout endpoint and then remove the user
     // from the state.
-    function logout() {
+    function logout(role) {
         Admin.userLogout().then(() => { setUser(undefined); });
 
     }
@@ -101,7 +101,7 @@ export function AuthProvider({
             user,
             loading,
             error,
-            loginAdmin,
+            loginUser,
             logout,
         }),
         [user, loading, error]

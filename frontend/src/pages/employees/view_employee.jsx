@@ -29,6 +29,8 @@ import { message } from "antd";
 import moment from "moment"
 import { MainTable } from "../../components/MainTable";
 import { DeleteButton, VieweButton } from "../../components/Buttons";
+import useAuth from "../../useAuth";
+import jwt from 'jwt-decode'
 
 const Employee = (props) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -40,6 +42,9 @@ const Employee = (props) => {
     const location = useLocation();
     const [datat, setDatat] = useState([]);
     let data = [];
+    const { user } = useAuth();
+    const userdatatk = localStorage.getItem('usertoken');
+    let role = user.role || jwt(userdatatk).role;
 
     const [userdata, setuserData] = useState({
         username: "",
@@ -270,7 +275,7 @@ const Employee = (props) => {
 
         }).catch((err) => {
             console.log(err);
-            message.error({ content: 'Something Went Wrong!', key, duration: 0 })
+            message.error({ content: 'Something Went Wrong!', key, duration: 2 })
         }).finally(() => {
             console.log(salaryData);
             tasksData.map((item) => {
@@ -313,7 +318,7 @@ const Employee = (props) => {
             message.success({ content: 'Updated!', key, duration: 0 })
 
         }).catch((err) => {
-            message.error({ content: 'Something Went Wrong!', key, duration: 0 })
+            message.error({ content: 'Something Went Wrong!', key, duration: 2 })
         })
 
     }
@@ -742,10 +747,10 @@ const Employee = (props) => {
                                                     </Col>
                                                 </Row>
                                                 <Row>
-                                                    <Col lg="6" >
+                                                    <Col lg={role == "admin" ? "6" : "3"} >
                                                         <FormGroup>
                                                             <Label for="bonus">Bonus</Label>
-                                                            <div className="d-inline-flex" style={{ height: "40px" }}>
+                                                            {role == "admin" ? <div className="d-inline-flex" style={{ height: "40px" }}>
                                                                 <Input
                                                                     type="number"
                                                                     className="form-control w-50"
@@ -763,7 +768,7 @@ const Employee = (props) => {
                                                                 >
                                                                     <span className="mx-2">Update Bonus</span>
                                                                 </Button>
-                                                            </div>
+                                                            </div> : <p>{salaryData.bonus}</p>}
                                                         </FormGroup>
 
                                                     </Col>

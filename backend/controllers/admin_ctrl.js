@@ -32,7 +32,7 @@ export const adminRegister = async (req, res) => {
         }
 
         // Get the hashed password
-        const password = await bcrypt.hash(adminDetails.password, 12);
+        const password = await bcrypt.hash(adminDetails.pass, 12);
         // create a new user
         const newAdmin = new Admin({
             ...adminDetails,
@@ -78,12 +78,18 @@ export const adminLogin = async (req, res) => {
 
     // That means admin is existing and trying to signin fro the right portal
     // Now check for the password
+    console.log(password);
+    console.log(admin.password);
     let isMatch = await bcrypt.compare(password, admin.password);
+    console.log(isMatch);
     if (isMatch) {
+        console.log(admin.member_id);
+
         // Sign in the token and issue it to the admin
         let token = jwt.sign(
             {
                 user_id: admin._id,
+                member_id: admin.member_id,
                 role: admin.role,
                 username: admin.username,
                 email: admin.email
@@ -141,9 +147,10 @@ export const createEmployee = async (req, res) => {
             });
             return;
         }
+        console.log(empDetails);
 
         // Get the hashed password
-        const password = await bcrypt.hash(empDetails.password, 12);
+        const password = await bcrypt.hash(empDetails.pass, 12);
         // create a new user
         const newEmployee = new Employee({
             ...empDetails,
@@ -335,7 +342,7 @@ export const createManager = async (req, res) => {
         }
 
         // Get the hashed password
-        const password = await bcrypt.hash(mngrDetails.password, 12);
+        const password = await bcrypt.hash(mngrDetails.pass, 12);
         // create a new user
         const newManager = new Manager({
             ...mngrDetails,

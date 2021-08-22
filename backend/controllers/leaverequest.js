@@ -5,7 +5,9 @@ import LeaveReq from '../models/leaverequest_model.js';
 export const createLeaveReq = async (req, res) => {
     try {
         const lrqDetails = req.body;
+        console.log(req.body);
         const newLeaveReq = new LeaveReq(lrqDetails);
+
 
         await newLeaveReq.save(function (err) {
             if (err) {
@@ -35,8 +37,7 @@ export const createLeaveReq = async (req, res) => {
 //get all leaveReqs
 export const getLeaveReqs = function (req, res, next) {
     LeaveReq.find({}).
-        populate({ path: 'employee_id', select: 'member_id' }).
-        populate({ path: 'approved_manager', select: 'member_id' }).exec().then((user) => {
+        populate({ path: 'employee_id', select: 'member_id fname department' }).exec().then((user) => {
             if (user.length < 1) {
                 return res.status(402).json({
                     message: "No leaveReqs data availble",
@@ -70,7 +71,6 @@ export const updateLeaveReq = async (req, res, next) => {
         } else {
 
             if (req.body.employee_id) { found_leaveReq.employee_id = req.body.employee_id }
-            if (req.body.department) { found_leaveReq.department = req.body.department }
             if (req.body.reason) { found_leaveReq.reason = req.body.reason }
             if (req.body.approved_manager) { found_leaveReq.approved_manager = req.body.approved_manager }
             if (req.body.status) { found_leaveReq.status = req.body.status }
@@ -105,7 +105,7 @@ export const getLeaveReqByid = (req, res, next) => {
 
     let query = { _id: req.params.id }
 
-    LeaveReq.findOne(query).populate('employee_id approved_manager').exec().then(leaveReq => {
+    LeaveReq.findOne(query).populate('employee_id').exec().then(leaveReq => {
         if (leaveReq < 1) {
             return res.status(402).json({
                 message: "No leaveReq data found",

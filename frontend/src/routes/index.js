@@ -16,6 +16,7 @@ import { Managers } from "../pages/managers/index";
 import Manager from "../pages/managers/view_manager";
 import { Tasks } from "../pages/tasks/index";
 import Task from "../pages/tasks/view_task";
+import { LeaveReqs } from "../pages/leavreq/index";
 // import AddCustomer from "../pages/customers/addUser";
 // import Settings from "../pages/settings/index";
 
@@ -37,6 +38,7 @@ const routes = [
   { path: "/dashboard/manager", exact: true, component: Manager, isAuth: true },
   { path: "/dashboard/tasks", exact: true, component: Tasks, isAuth: true },
   { path: "/dashboard/task", exact: true, component: Task, isAuth: true },
+  { path: "/dashboard/leaverequests", exact: true, component: LeaveReqs, isAuth: true },
   // {
   //   path: "/dashboard/invoices",
   //   exact: true,

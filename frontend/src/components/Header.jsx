@@ -18,6 +18,9 @@ const toggleMenu = () => {
 
 export function Header(props) {
   const userdata = localStorage.getItem('usertoken');
+  const { user } = useAuth();
+  console.log(user);
+
   return (
     <React.Fragment>
       <header id="page-topbar">

@@ -32,7 +32,8 @@ import { MainTable } from "../../components/MainTable";
 import { DeleteButton, EditButton, VieweButton } from "../../components/Buttons";
 import { message, Modal, Select, DatePicker } from "antd";
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-
+import useAuth from "../../useAuth";
+import jwt from 'jwt-decode'
 
 export const Tasks = (props) => {
     const [activeTabProgress, setActiveTabProgress] = useState(1);
@@ -49,6 +50,9 @@ export const Tasks = (props) => {
     const [isvalid, setisvalid] = useState(false);
     const [data, setData] = useState([]);
     const [meta, setMeta] = useState({});
+    const { user } = useAuth();
+    const userdatatk = localStorage.getItem('usertoken');
+    let role = user.role || jwt(userdatatk).role;
 
 
 
@@ -184,12 +188,20 @@ export const Tasks = (props) => {
         let urldata = window.location.pathname.split("/");
         let userid = urldata[urldata.length - 1];
         console.log(urldata[urldata.length - 2]);
+        userid = jwt(userdatatk).user_id
+        console.log(role);
 
         if (urldata[urldata.length - 2] === "delete") {
             showDeleteConfirm(userid);
         } else {
-            loadAllTasks(null);
-            loadAllTaskType();
+
+            if (role == "admin" || role == "manager") {
+                loadAllTasks(null);
+                loadAllTaskType();
+            }
+            if (role == "employee") {
+                loadtaskbyemp(userid)
+            }
         }
 
     }, [location]);
@@ -325,7 +337,44 @@ export const Tasks = (props) => {
             })
             .catch((err) => {
                 console.log(err);
+                message.warning({ content: 'No Data Found!', key, duration: 2 });
+            })
+    }
 
+    //getall tasks by employee
+    const loadtaskbyemp = (params) => {
+        message.loading({ content: 'Data Loading...', key, duration: 0 })
+        Task.getTaskByEmployee(params)
+            .then((result) => {
+                message.success({ content: 'Loaded!', key, duration: 2 });
+                const rdata = result.data;
+                console.log(rdata);
+
+                setData(rdata.map((item) => {
+                    const udate = moment(item.updated_at).format('YY MMM DD - HH:mm')
+                    const deaddate = moment(item.deadline).format('YY MMM DD - HH:mm')
+
+                    return (
+                        {
+                            id: item._id,
+                            task_type: `${item.task_type.department} - ${item.task_type.main_product} - ${item.task_type.sub_product}`,
+                            department: item.department,
+                            assignee: item.assignee.member_id,
+                            manager: item.manager.member_id,
+                            target: item.target,
+                            completed: item.completed,
+                            status: item.status == "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
+                            deadline: deaddate,
+                            updated_at: udate
+                        }
+                    )
+                }))
+
+
+            })
+            .catch((err) => {
+                console.log(err);
+                message.warning({ content: 'No Data Found!', key, duration: 2 });
             })
     }
 
@@ -351,7 +400,7 @@ export const Tasks = (props) => {
                                 <i className="ri-user-add-line align-middle"></i>
                                 <span className="mx-2">Add Task</span>
                             </Button>
-                            <Button
+                            {role == "admin" ? <Button
                                 onClick={() => {
                                     setModal_addTaskType(true);
                                 }}
@@ -360,7 +409,7 @@ export const Tasks = (props) => {
                             >
                                 <i className="ri-user-add-line align-middle"></i>
                                 <span className="mx-2">Add Task Type</span>
-                            </Button>
+                            </Button> : <></>}
                             <Card>
                                 <CardBody>
                                     <MainTable

@@ -220,7 +220,7 @@ export const Managers = (props) => {
             })
             .catch((err) => {
                 console.log(err);
-
+                message.warning({ content: 'No Data Found!', key, duration: 2 });
             })
     }
 

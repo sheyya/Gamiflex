@@ -5,23 +5,18 @@ const leavereqSchema = mongoose.Schema({
     employee_id: {
         type: Schema.Types.ObjectId, ref: 'employees', required: true
     },
-    department: {
-        type: String,
-        required: true
-    },
     reason: {
         type: String
     },
     approved_manager: {
-        type: Schema.Types.ObjectId, ref: 'managers', required: true
+        type: String, required: false
     },
     status: {
         type: String,
         default: "pending",
     },
     dateRange: {
-        type: Date,
-        default: Date.now()
+        type: Array
     },
     created_at: {
         type: Date, default: Date.now()

@@ -1,44 +1,48 @@
 
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import Manager from '../models/manager_model.js';
+import Employee from '../models/employee_model.js';
 import { SECRET } from '../config/index.js'
 
 
-//manager login
-export const managerLogin = async (req, res) => {
-    let managerCreds = req.body
-    let { username, password } = managerCreds;
+//employee login
+export const employeeLogin = async (req, res) => {
+    let employeeCreds = req.body
+    let { username, password } = employeeCreds;
+
     // First Check if the username is in the database
-    const manager = await Manager.findOne({ username });
-    if (!manager) {
+    const employee = await Employee.findOne({ username });
+    if (!employee) {
         return res.status(404).json({
             message: "Username is not found. Invalid login credentials.",
             success: false
         });
     }
 
-    // That means manager is existing and trying to signin fro the right portal
+    // That means employee is existing and trying to signin fro the right portal
     // Now check for the password
-    let isMatch = await bcrypt.compare(password, manager.password);
+    console.log(password);
+    console.log(employee.password);
+
+    let isMatch = await bcrypt.compare(password, employee.password);
+    console.log(isMatch);
     if (isMatch) {
-        // Sign in the token and issue it to the manager
+        // Sign in the token and issue it to the employee
         let token = jwt.sign(
             {
-                user_id: manager._id,
-                member_id: manager.member_id,
-                role: manager.role,
-                username: manager.username,
-                email: manager.email
+                user_id: employee._id,
+                role: employee.role,
+                username: employee.username,
+                email: employee.email
             },
             SECRET,
             { expiresIn: "7 days" }
         );
 
         let result = {
-            username: manager.username,
-            role: manager.role,
-            email: manager.email,
+            username: employee.username,
+            role: employee.role,
+            email: employee.email,
             token: `Bearer ${token}`,
             expiresIn: 168
         };

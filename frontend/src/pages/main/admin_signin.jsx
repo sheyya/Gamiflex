@@ -19,7 +19,7 @@ import welcome from "../../assets/images/welcome.png";
 import useAuth from "../../useAuth";
 
 const Admin_Signin = () => {
-  const { loginAdmin, loading } = useAuth();
+  const { loginUser, loading } = useAuth();
   const [usernameval, setUsernameval] = useState("");
   const [passval, setPassval] = useState("");
   const [error, setError] = useState("");
@@ -39,7 +39,7 @@ const Admin_Signin = () => {
     e.preventDefault();
 
     //call login controller function
-    var status = await loginAdmin(
+    var status = await loginUser(Admin,
       usernameval,
       passval
     );

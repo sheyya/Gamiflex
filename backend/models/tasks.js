@@ -27,6 +27,10 @@ const tasksSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    completedbyEmp: {
+        type: Number,
+        default: 0
+    },
     updated_at: {
         type: Date,
         default: Date.now()

@@ -11,7 +11,7 @@ import {
 } from "reactstrap";
 import { Link, RouteComponentProps } from "react-router-dom";
 import { AvForm, AvField } from "availity-reactstrap-validation";
-import Manager from "../../controllers/admin";
+import Manager from "../../controllers/manager";
 import { withRouter } from 'react-router-dom'
 // import images
 import logodark from "../../assets/images/logo-dark.png";
@@ -58,7 +58,7 @@ const Manager_Signin = () => {
       case true:
         //success redirect
         //  history.push('/dashboard/overview') 
-        window.location.replace('/dashboard/overview')
+        window.location.replace('/dashboard/overview/mngr')
         break;
     }
 

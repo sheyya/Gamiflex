@@ -219,6 +219,7 @@ export const Employees = (props) => {
 
             })
             .catch((err) => {
+                message.warning({ content: 'No Data Found!', key, duration: 2 });
             })
     }
 

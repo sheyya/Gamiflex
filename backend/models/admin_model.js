@@ -16,6 +16,10 @@ const adminSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    member_id: {
+        type: String,
+        required: true
+    },
     password: {
         type: String,
         required: true

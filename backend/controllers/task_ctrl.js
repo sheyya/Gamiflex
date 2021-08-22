@@ -84,6 +84,7 @@ export const updateTask = async (req, res, next) => {
             if (req.body.deadline) { found_task.deadline = req.body.deadline }
             if (req.body.status) { found_task.status = req.body.status }
             if (req.body.completed) { found_task.completed = req.body.completed }
+            if (req.body.completedbyEmp) { found_task.completedbyEmp = req.body.completedbyEmp }
             if (req.body.updated_at) { found_task.updated_at = req.body.updated_at }
 
             found_task.updated_at = new Date();

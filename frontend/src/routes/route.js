@@ -15,6 +15,8 @@ function AuthenticatedRoute({ ...props }) {
   return <Route {...props} />;
 }
 
+
+
 export const AppRoute = ({
   isAuthenticated,
   component: Component,

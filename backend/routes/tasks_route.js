@@ -33,17 +33,17 @@ router.post(
 //===========tasks===========
 router.get('/tsk', userAuth, checkRole(["admin", "manager"]), taskController.getTasks);
 router.post('/tsk', userAuth, checkRole(["admin", "manager"]), taskController.createTask);
-router.get('/tskbyemp', userAuth, checkRole(["admin", "manager"]), taskController.getTasksByEmp);
-router.get('/tsk/:id', userAuth, checkRole(["admin", "manager"]), taskController.getTaskByid);
-router.patch('/tsk/:id', userAuth, checkRole(["admin", "manager"]), taskController.updateTask);
+router.get('/tskbyemp', userAuth, checkRole(["admin", "manager", "employee"]), taskController.getTasksByEmp);
+router.get('/tsk/:id', userAuth, checkRole(["admin", "manager", "employee"]), taskController.getTaskByid);
+router.patch('/tsk/:id', userAuth, checkRole(["admin", "manager", "employee"]), taskController.updateTask);
 router.delete('/tsk/:id', userAuth, checkRole(["admin", "manager"]), taskController.deleteTask);
 
 //=========taststypes===========
 router.get('/tsktype', userAuth, checkRole(["admin", "manager"]), taskController.getTaskTypes);
-router.post('/tsktype', userAuth, checkRole(["admin", "manager"]), taskController.createTaskType);
+router.post('/tsktype', userAuth, checkRole(["admin"]), taskController.createTaskType);
 router.get('/tsktype/:id', userAuth, checkRole(["admin", "manager"]), taskController.getTaskTypeByid);
-router.patch('/tsktype/:id', userAuth, checkRole(["admin", "manager"]), taskController.updateTaskType);
-router.delete('/tsktype/:id', userAuth, checkRole(["admin", "manager"]), taskController.deleteTaskType);
+router.patch('/tsktype/:id', userAuth, checkRole(["admin"]), taskController.updateTaskType);
+router.delete('/tsktype/:id', userAuth, checkRole(["admin"]), taskController.deleteTaskType);
 
 
 export default router;

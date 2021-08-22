@@ -16,9 +16,10 @@ import { withRouter } from 'react-router-dom'
 // import images
 import logodark from "../../assets/images/logo-dark.png";
 import welcome from "../../assets/images/welcome.png";
+import useAuth from "../../useAuth";
 
 const Employee_Signin = () => {
-
+  const { loginUser, loading } = useAuth();
   const [usernameval, setUsernameval] = useState("");
   const [passval, setPassval] = useState("");
   const [error, setError] = useState("");
@@ -38,13 +39,19 @@ const Employee_Signin = () => {
     e.preventDefault();
 
     //call login controller function
-    var status = await Employee.userSignIn(
+    var status = await loginUser(Employee,
       usernameval,
       passval
     );
 
     switch (status) {
 
+      // password not match
+      case 403:
+        await setError(
+          "Inavlid Username or Password"
+        );
+        return -1;
       // user not found
       case 400:
         await setError(
@@ -58,7 +65,7 @@ const Employee_Signin = () => {
       case true:
         //success redirect
         //  history.push('/dashboard/overview') 
-        window.location.replace('/dashboard/overview')
+        window.location.replace('/dashboard/overview/emp')
         break;
     }
 
