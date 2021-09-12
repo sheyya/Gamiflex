@@ -128,6 +128,8 @@ export const getLeaveReqByid = (req, res, next) => {
 
 //get filtered leaveReqs by employee
 export const getLeaveReqsByEmp = (req, res, next) => {
+    console.log(req.query.id);
+    console.log("tt");
 
     let query = {
         path: 'employee_id',

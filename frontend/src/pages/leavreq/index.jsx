@@ -252,6 +252,8 @@ export const LeaveReqs = (props) => {
     //getall leavereqs by employee
     const loadleavereqbyemp = (params) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
+        console.log(params);
+
         LeaveReq.getLeaveReqByEmployee(params)
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
@@ -376,7 +378,7 @@ export const LeaveReqs = (props) => {
                                     approved_manager: "",
                                     dateRange: ""
                                 });
-                                loadleavereqbyemp(null);
+                                loadleavereqbyemp(userid);
 
                             })
                                 .catch(err => {

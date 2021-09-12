@@ -489,6 +489,7 @@ export const Employees = (props) => {
                                                                 type="text"
                                                                 className="form-control"
                                                                 defaultValue={userState.username}
+                                                                // defaultValue={`${userState.fname}${userState.member_id}`}
                                                                 onChange={handleChange}
                                                                 id="username"
                                                                 name="username"
