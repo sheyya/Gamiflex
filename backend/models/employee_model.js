@@ -64,6 +64,10 @@ const empSchema = mongoose.Schema({
     role: {
         type: String,
         default: "employee"
+    },
+    marks: {
+        type: Number,
+        default: 0
     }
 })
 

@@ -8,7 +8,11 @@ import Config from "./Config";
 const api = {
   tasks: "tasks/tsk",
   taskTypes: "tasks/tsktype",
-  taskbyemp: "tasks/tskbyemp"
+  taskbyemp: "tasks/tskbyemp",
+  countoday: "tasks/countoday",
+  countodaybyemp: "tasks/countodaybyemp",
+  targetcountoday: "tasks/targetoday",
+  targetcountodaybyemp: "tasks/targetodaybyemp"
 };
 
 class Task {
@@ -136,7 +140,95 @@ class Task {
     })
   }
 
+  async getTasksCountToday() {
 
+    const config = {
+      headers: { Authorization: `${localStorage.getItem('usertoken')}` }
+    };
+    return new Promise((resolve, reject) => {
+      return axios.get(`${Config.host}${Config.port}${api.countoday}`, config)
+        .then(result => {
+          if (result.status === 200) {
+            resolve(result.data)
+
+          } else {
+            resolve([])
+
+          }
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
+  }
+
+  async getTasksCountTodaybyEmp(data) {
+
+    const config = {
+      headers: { Authorization: `${localStorage.getItem('usertoken')}` },
+      params: data
+    };
+    return new Promise((resolve, reject) => {
+      return axios.get(`${Config.host}${Config.port}${api.countodaybyemp}`, config)
+        .then(result => {
+          if (result.status === 200) {
+            resolve(result.data)
+
+          } else {
+            resolve([])
+
+          }
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
+  }
+
+  async getTargetCountToday() {
+
+    const config = {
+      headers: { Authorization: `${localStorage.getItem('usertoken')}` }
+    };
+    return new Promise((resolve, reject) => {
+      return axios.get(`${Config.host}${Config.port}${api.targetcountoday}`, config)
+        .then(result => {
+          if (result.status === 200) {
+            resolve(result.data)
+
+          } else {
+            resolve([])
+
+          }
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
+  }
+
+  async getTargetCountTodaybyEmp(data) {
+
+    const config = {
+      headers: { Authorization: `${localStorage.getItem('usertoken')}` },
+      params: data
+    };
+    return new Promise((resolve, reject) => {
+      return axios.get(`${Config.host}${Config.port}${api.targetcountodaybyemp}`, config)
+        .then(result => {
+          if (result.status === 200) {
+            resolve(result.data)
+
+          } else {
+            resolve([])
+
+          }
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
+  }
 
   //TaskTypes
 

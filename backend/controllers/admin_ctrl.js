@@ -206,12 +206,14 @@ export const getEmployees = function (req, res, next) {
         });
 };
 
-// update manager
+// update employee
 export const updateEmployee = async (req, res, next) => {
     let pass;
     let query = { _id: req.params.id }
+    console.log(req.body.pass);
+
     if (req.body.username) {
-        pass = await bcrypt.hash(req.body.password, 12);
+        pass = await bcrypt.hash(req.body.pass, 12);
     }
     Employee.findOne(query).exec().then(found_employee => {
         if (found_employee < 1) {

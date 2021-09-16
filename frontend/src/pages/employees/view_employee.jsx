@@ -87,7 +87,7 @@ const Employee = (props) => {
             ...userdata,
             [e.target.name]: value,
         });
-        console.log(userdata);
+
 
     };
 
@@ -251,8 +251,8 @@ const Employee = (props) => {
         let urldata = window.location.pathname.split("/");
         let userids = urldata[urldata.length - 1];
         console.log(tasksData);
-        const startOfMonth = moment().startOf('month').format('YYYY-MM-DD hh:mm');
-        const endOfMonth = moment().endOf('month').format('YYYY-MM-DD hh:mm');
+        const startOfMonth = moment().subtract(1, 'months').startOf('month').date(28).format('YYYY-MM-DD hh:mm')
+        const endOfMonth = moment().date(27).format('YYYY-MM-DD hh:mm')
         console.log(startOfMonth);
         console.log(endOfMonth);
         let cs = 0

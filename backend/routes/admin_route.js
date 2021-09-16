@@ -35,7 +35,7 @@ router.post('/signin', adminController.adminLogin);
 router.post('/reg_admin', userAuth, checkRole(["admin"]), adminController.adminRegister);
 
 //===========users===========
-router.get('/emp', userAuth, checkRole(["admin", "manager"]), adminController.getEmployees);
+router.get('/emp', userAuth, checkRole(["admin", "manager", "employee"]), adminController.getEmployees);
 router.post('/emp', userAuth, checkRole(["admin", "manager"]), adminController.createEmployee);
 router.get('/emp/:id', userAuth, checkRole(["admin", "manager"]), adminController.getEmployeeByid);
 router.patch('/emp/:id', userAuth, checkRole(["admin", "manager"]), adminController.updateEmployee);

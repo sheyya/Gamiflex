@@ -1,43 +1,205 @@
-import React, { useState } from "react";
-import "../invoices/invoices.scss";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import logodark from "../../assets/images/logo-dark.png";
-import { Container, Row, Col, Card, CardBody, Media, Modal, ModalBody, ModalHeader, Table, UncontrolledTooltip } from "reactstrap";
-import { DeleteButton, EditButton, VieweButton } from "../../components/Buttons";
-import { MainTable } from "../../components/MainTable";
+import dayjs from "dayjs";
+import "./dashboard.scss";
+import jwt from 'jwt-decode';
+import {
+    Container,
+    Row,
+    Col,
+    Card,
+    CardBody,
+    Media,
+    Modal,
+    ModalBody,
+    ModalHeader,
+    Table,
+} from "reactstrap";
+import { VieweButton } from "../../components/Buttons";
+import { Leaderbord } from "../../components/leaderboard/leaderboard";
+import Emp from "../../controllers/employee";
+import Mngr from "../../controllers/manager";
+import Tsk from "../../controllers/task";
+import { Switch } from "antd";
+import useAuth from "../../useAuth";
 
-// import { BarCharts } from "./barchart";
-// import { PieCharts } from "./piechart";
 
 export function Overview(props) {
+    const { user } = useAuth();
     const [modal_static, setModal_static] = useState(false);
     const [meta, setMeta] = useState({});
-    // let data: { id; invoiceno; name; email; date; amount; status; }[] = [];
-    const toggle = () => setModal_static(!modal_static);
+    const [invoiceList, setInvoiceList] = useState([]);
+    const userdatatk = localStorage.getItem('usertoken');
+    let role = user.role || jwt(userdatatk).role;
+    let userid = jwt(userdatatk).user_id
+    let mngr_mid;
+    // const [countData, setCountData] = useState({
+    //     mngrcountc: 0, empcountc: 0, taskcountc: 0, taskcountbyempc: 0, targetcount: 0, completedcount: 0
+    // })
+    const [loading, setLoading] = useState(false)
+    const [mngrcountc, setMngrcountc] = useState(0)
+    const [empcountc, setEmpcountc] = useState(0)
+    const [taskcountc, setTaskcountc] = useState(0)
+    const [taskcountbyempc, setTaskcountbyempc] = useState(0)
+    const [targetcount, setTargetcount] = useState(0)
+    const [completedcount, setCompletedcount] = useState(0)
+    const location = useLocation();
+
+    useEffect(() => {
+
+        let urldata = window.location.pathname.split("/");
+        let req_id = urldata[urldata.length - 1];
+        console.log(urldata[urldata.length - 2]);
+        userid = jwt(userdatatk).user_id
+        role == "admin" || role == "manager" ? mngr_mid = jwt(userdatatk).member_id : mngr_mid = "";
+        console.log(role);
+
+        if (role == "admin") {
+            getempcount();
+            getmngrcount();
+            gettaskscount();
+            gettargetcount();
+        }
+        else if (role == "manager") {
+            getempcount();
+            console.log(getempcount());
+            gettaskscount();
+            gettargetcount();
+        }
+        else if (role == "employee") {
+            gettaskscountbyemp({ id: userid });
+            gettargetcountbyemp({ id: userid })
+        }
+
+    }, [location]);
+
+    let data;
+
+    const getempcount = () => {
+        let out;
+        setLoading(true)
+        const ss = Emp.empCount()
+            .then((result) => {
+                out = result.count
+                setEmpcountc(out)
+                // setCountData(prevState => ({
+                //     ...prevState,
+                //     empcountc: out
+                // }));
+                setLoading(false)
+            })
+            .catch((err) => {
+                console.log(err);
+                setLoading(false)
+                out = 0;
+            });
+
+        return ss;
+    };
+
+    const getmngrcount = () => {
+        setLoading(true)
+        const ss = Mngr.mngrCount()
+            .then((result) => {
+                const out = result.count
+                // console.log(out);
+                setMngrcountc(out)
+                setLoading(false)
+                // setCountData(prevState => ({
+                //     ...prevState,
+                //     mngrcountc: out
+                // }));
 
 
-    const loadAllInvoices = () => {
-        return;
-    }
-    let data =
-        [{
-            id: "1",
-            invoiceno: "1003232",
-            name: "John Doe",
-            email: "johndoe@mail.com",
-            date: "01 jun 2021",
-            amount: "$1200",
-            status: <div className="badge badge-soft-warning font-size-14">unpaid</div>,
-        },
-        {
-            id: "2",
-            invoiceno: "1003232",
-            name: "Jane Doe",
-            email: "janedoe@mail.com",
-            date: "11 jun 2021",
-            amount: "$1000",
-            status: <div className="badge badge-soft-success font-size-14">Paid</div>,
-        },]
+            })
+            .catch((err) => {
+                console.log(err);
+                setLoading(false)
+                return 0
+            });
+        return ss
+    };
+
+    const gettaskscount = () => {
+        setLoading(true)
+        const ss = Tsk.getTasksCountToday()
+            .then((result) => {
+                const out = result.count
+                // console.log(out);
+                setTaskcountc(out)
+                setLoading(false)
+                // setCountData(prevState => ({
+                //     ...prevState,
+                //     taskcountc: out
+                // }));
+                return out;
+            })
+            .catch((err) => {
+                console.log(err);
+                setLoading(false)
+                return 0
+            });
+        return ss;
+    };
+
+    const gettaskscountbyemp = (userid) => {
+        setLoading(true)
+        const ss = Tsk.getTasksCountTodaybyEmp(userid)
+            .then((result) => {
+                const out = result.count
+                // console.log(out);
+                setTaskcountbyempc(out)
+                setLoading(false)
+                // setCountData(prevState => ({
+                //     ...prevState,
+                //     taskcountbyempc: out
+                // }));
+            })
+            .catch((err) => {
+                console.log(err);
+                setLoading(false)
+            });
+        return ss;
+    };
+
+    const gettargetcount = () => {
+        setLoading(true)
+        Tsk.getTargetCountToday()
+            .then((result) => {
+                const out = result.data
+                console.log(out);
+                // setCountData({ ...countData, targetcount: out[0].totarget, completedcount: out[0].totcompleted })
+                setTargetcount(out[0].totarget)
+                setCompletedcount(out[0].totcompleted)
+                setLoading(false)
+            })
+            .catch((err) => {
+                console.log(err);
+                setLoading(false)
+                return 0
+
+            });
+    };
+
+    const gettargetcountbyemp = (userid) => {
+        setLoading(true)
+        Tsk.getTargetCountTodaybyEmp(userid)
+            .then((result) => {
+                const out = result.data
+                console.log(out);
+                // setCountData({ ...countData, targetcount: out[0].totarget, completedcount: out[0].totcompleted })
+                setTargetcount(out[0].totarget)
+                setCompletedcount(out[0].totcompleted)
+                setLoading(false)
+
+            })
+            .catch((err) => {
+                console.log(err);
+                setLoading(false)
+            });
+    };
+
 
     return (
         <React.Fragment>
@@ -47,226 +209,87 @@ export function Overview(props) {
                     <Row>
                         <Col xl={8}>
                             <Row>
-                                <Col md={4}>
+                                <Col md={3} className={role == "admin" || role == "manager" ? "d-block" : "d-none"}>
                                     <Card>
                                         <CardBody>
                                             <Media>
                                                 <Media body className="overflow-hidden">
                                                     <p className="text-truncate font-size-14 mb-2">
-                                                        Users
+                                                        Employees
                                                     </p>
-                                                    <h4 className="mb-0">12</h4>
+                                                    {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : <h4 className="mb-0">{empcountc}</h4>}
                                                 </Media>
                                                 <div className="text-primary">
                                                     <i className="ri-account-circle-line font-size-24"></i>
                                                 </div>
                                             </Media>
                                         </CardBody>
-
-                                        {/* <CardBody className="border-top py-3">
-                                            <div className="text-truncate">
-                                                <span className="badge text-success font-size-11 mr-1">
-                                                    <i className="mdi mdi-menu-up"> </i> 24.5
-                                                </span>
-                                                <span className="text-muted ml-2">
-                                                    From previous Period
-                                                </span>
-                                            </div>
-                                        </CardBody> */}
                                     </Card>
                                 </Col>
-                                <Col md={4}>
+                                <Col md={3} className={role == "admin" ? "d-block" : "d-none"}>
                                     <Card>
                                         <CardBody>
                                             <Media>
                                                 <Media body className="overflow-hidden">
                                                     <p className="text-truncate font-size-14 mb-2">
-                                                        Invoices
+                                                        Managers
                                                     </p>
-                                                    <h4 className="mb-0">20</h4>
+                                                    {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : <h4 className="mb-0">{mngrcountc}</h4>}
                                                 </Media>
                                                 <div className="text-primary">
                                                     <i className="mdi mdi-receipt font-size-24"></i>
                                                 </div>
                                             </Media>
                                         </CardBody>
-
-                                        {/* <CardBody className="border-top py-3">
-                                            <div className="text-truncate">
-                                                <span className="badge text-success font-size-11 mr-1">
-                                                    <i className="mdi mdi-menu-up"> </i> 24.5
-                                                </span>
-                                                <span className="text-muted ml-2">
-                                                    From previous Period
-                                                </span>
-                                            </div>
-                                        </CardBody> */}
                                     </Card>
                                 </Col>
-
+                                <Col md={3}>
+                                    <Card>
+                                        <CardBody>
+                                            <Media>
+                                                <Media body className="overflow-hidden">
+                                                    <p className="text-truncate font-size-14 mb-2">
+                                                        Today Tasks
+                          </p>
+                                                    {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : <h4 className="mb-0">{role == "admin" || role == "manager" ? taskcountc : taskcountbyempc}</h4>}
+                                                </Media>
+                                                <div className="text-primary">
+                                                    <i className="mdi mdi-receipt font-size-24"></i>
+                                                </div>
+                                            </Media>
+                                        </CardBody>
+                                    </Card>
+                                </Col>
+                                <Col md={3}>
+                                    <Card>
+                                        <CardBody>
+                                            <Media>
+                                                <Media body className="overflow-hidden">
+                                                    <p className="text-truncate font-size-14 mb-2">
+                                                        Today Targets
+                          </p>
+                                                    {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : <h4 className="mb-0">{completedcount}/<span className="text-muted"><small>{targetcount}</small></span></h4>}
+                                                </Media>
+                                                <div className="text-primary">
+                                                    <i className="mdi mdi-target font-size-24"></i>
+                                                </div>
+                                            </Media>
+                                        </CardBody>
+                                    </Card>
+                                </Col>
                             </Row>
-
-                            {/* revenue Analytics */}
-                            {/* <BarCharts /> */}
-                        </Col>
-
-                        <Col xl={4}>
-                            {/* sales Analytics */}
-                            {/* <PieCharts /> */}
                         </Col>
                     </Row>
                     <Row>
                         <div className="page-title-box">
-                            <h4 className="mb-0">Recent Invoices</h4>
+                            <h4 className="mb-0">Leaderboard</h4>
                         </div>
 
-                        <Row>
-                            <Col xs={12}>
-                                <Card>
-                                    <CardBody>
-                                        <MainTable
-                                            meta={meta}
-                                            data={data}
-                                            handlePageChange={loadAllInvoices}
-                                            columns={[
-                                                {
-                                                    label: "Invoice No.",
-                                                    field: "invoiceno"
-                                                },
-                                                {
-                                                    label: "Name",
-                                                    field: "name"
-                                                },
-                                                {
-                                                    label: "Email",
-                                                    field: "email"
-                                                },
-                                                {
-                                                    label: "Dane",
-                                                    field: "date"
-                                                },
-                                                {
-                                                    label: "Amount",
-                                                    field: "amount"
-                                                },
-                                                {
-                                                    label: "Status",
-                                                    field: "status"
-                                                }
-                                            ]}
-                                            actions={[
-                                                { button: <VieweButton />, path: "/dashboard/invoice/" },
-                                            ]}
-                                        />
-                                    </CardBody>
-                                </Card>
+                        <div>
+                            <Col xs={12} lg={12} xl={8}>
+                                <Leaderbord />
                             </Col>
-                        </Row>
-                        <Modal
-                            isOpen={modal_static}
-                            toggle={toggle}
-                            backdrop="static"
-                            centered
-                            size="lg"
-                        >
-                            <ModalHeader
-                                toggle={() => {
-                                    setModal_static(false);
-                                }}
-                            >
-                                View Invoice{" "}
-                                <Link to="#" type="button" className="mx-2 text-success">
-                                    {" "}
-                                    <i className="mdi mdi-printer font-size-20"></i>
-                                </Link>
-                            </ModalHeader>
-                            <ModalBody style={{ fontFamily: "sans-serif" }} className="px-5">
-                                <Row className="mb-4">
-                                    <Col lg="6" sm="6" xs="6">
-                                        <h2>INVOICE</h2>
-                                    </Col>
-                                    <Col lg="6" sm="6" xs="6" className="logo">
-                                        <span className="logo-lg">
-                                            <img
-                                                style={{ float: "right" }}
-                                                src={logodark}
-                                                height="30"
-                                                alt="logo"
-                                            />
-                                        </span>
-                                        <span style={{ float: "right" }} className="logo-sm">
-                                            <img
-                                                style={{ float: "right" }}
-                                                src={logodark}
-                                                height="20"
-                                                alt="logo"
-                                            />
-                                        </span>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col lg="6" sm="5">
-                                        <Row>
-                                            <p className="fw-bolder">RockDen Advisors</p>
-                                            <p>John Doe</p>
-                                            <p>johndoe@gmail.com</p>
-                                        </Row>
-                                        <Row className="mt-3">
-                                            <p className="fw-bolder">Bill to</p>
-                                            <p>John Doe</p>
-                                            <p>johndoe@gmail.com</p>
-                                        </Row>
-                                    </Col>
-                                    <Col lg="6" sm="7" className="mt-3">
-                                        <Row>
-                                            <Col lg="6" sm="6" xs="6">
-                                                <b>
-                                                    <p>Invoice No.</p>
-                                                    <p>Invoiced On</p>
-                                                    <p>Due Date</p>
-                                                    <p>Amount</p>
-                                                    <p>Status</p>
-                                                </b>
-                                            </Col>
-                                            <Col lg="6" sm="6" xs="6">
-                                                <p>10067373</p>
-                                                <p>01 Jun 2021</p>
-                                                <p>25 Jun 2021</p>
-                                                <p>$100</p>
-                                                <p>Unpaid</p>
-                                            </Col>
-                                        </Row>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <div className="mt-3">
-                                        <div className="table-responsive">
-                                            <Table className="mb-0 invoice-table">
-                                                <thead className="thead-light">
-                                                    <tr>
-                                                        <th>Description</th>
-                                                        <th></th>
-                                                        <th>Amount</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>June Advisory Fee</td>
-                                                        <td></td>
-                                                        <td>$200</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td className="fw-bolder">Total</td>
-                                                        <td className="fw-bolder">$1200</td>
-                                                    </tr>
-                                                </tbody>
-                                            </Table>
-                                        </div>
-                                    </div>
-                                </Row>
-                            </ModalBody>
-                        </Modal>
+                        </div>
                     </Row>
                 </Container>
             </div>

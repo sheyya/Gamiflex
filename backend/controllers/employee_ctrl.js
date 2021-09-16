@@ -9,7 +9,6 @@ import { SECRET } from '../config/index.js'
 export const employeeLogin = async (req, res) => {
     let employeeCreds = req.body
     let { username, password } = employeeCreds;
-
     // First Check if the username is in the database
     const employee = await Employee.findOne({ username });
     if (!employee) {
@@ -58,4 +57,19 @@ export const employeeLogin = async (req, res) => {
             success: false
         });
     }
+};
+
+
+export const employeeCount = async (req, res) => {
+    var query = Employee.find();
+    query.countDocuments(function (err, count) {
+        if (err) {
+            console.log(err)
+        }
+        else {
+            return res.status(200).json({
+                count: count
+            });
+        }
+    });
 };

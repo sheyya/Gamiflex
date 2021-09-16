@@ -23,6 +23,7 @@ const checkRole = roles => (req, res, next) => {
 
 //==========managers===========
 router.post('/signin', managerController.managerLogin);
+router.get('/count', userAuth, checkRole(["admin", "manager"]), managerController.managerCount);
 
 
 export default router;

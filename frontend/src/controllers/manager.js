@@ -7,6 +7,7 @@ import Config from "./Config";
 
 const api = {
   signin: "manager/signin",
+  count: "manager/count",
 };
 
 class Manager {
@@ -58,6 +59,29 @@ class Manager {
       isUser = false;
     }
     return isUser;
+  }
+
+  // get manager count
+  async mngrCount() {
+
+    const config = {
+      headers: { Authorization: `${localStorage.getItem('usertoken')}` }
+    };
+    return new Promise((resolve, reject) => {
+      return Axios.get(`${Config.host}${Config.port}${api.count}`, config)
+        .then(result => {
+          if (result.status === 200) {
+            resolve(result.data)
+
+          } else {
+            resolve([])
+
+          }
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
   }
 
   // async createPlatformUser(data) {

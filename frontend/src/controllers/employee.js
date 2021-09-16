@@ -7,6 +7,7 @@ import Config from "./Config";
 
 const api = {
   signin: "employee/signin",
+  count: "employee/count"
 };
 
 class Employee {
@@ -42,6 +43,29 @@ class Employee {
       return userData;
     }
     return resp;
+  }
+
+  // get employee count
+  async empCount() {
+
+    const config = {
+      headers: { Authorization: `${localStorage.getItem('usertoken')}` }
+    };
+    return new Promise((resolve, reject) => {
+      return Axios.get(`${Config.host}${Config.port}${api.count}`, config)
+        .then(result => {
+          if (result.status === 200) {
+            resolve(result.data)
+
+          } else {
+            resolve([])
+
+          }
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
   }
 
   userLogout() {

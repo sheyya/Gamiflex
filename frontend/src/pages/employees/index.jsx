@@ -199,7 +199,6 @@ export const Employees = (props) => {
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
-                setMeta(result.meta)
                 setData(rdata.map((item) => {
                     const date = moment(item.created_at).format('YYYY MMMM DD')
                     console.log(date);

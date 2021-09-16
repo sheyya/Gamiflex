@@ -1,7 +1,7 @@
 
 import Task from '../models/tasks.js';
 import TaskType from '../models/tasks_types.js';
-
+import mongoose from 'mongoose';
 
 //----- TASKS -----//
 
@@ -47,7 +47,7 @@ export const getTasks = function (req, res, next) {
                     message: "No tasks data availble",
                 });
             } else {
-                console.log(user);
+                // console.log(user);
 
                 return res.status(200).json({
                     success: true,
@@ -145,8 +145,9 @@ export const getTasksByEmp = (req, res, next) => {
             _id: req.query.id
         }
     }
+    console.log(req.query.id);
 
-    Task.find().populate(query).populate('manager task_type').exec().then(tasks => {
+    Task.find({ assignee: req.query.id }).populate('manager assignee task_type').exec().then(tasks => {
         if (tasks < 1) {
             return res.status(402).json({
                 message: "No task data found",
@@ -174,6 +175,7 @@ export const getTasksByEmp = (req, res, next) => {
 export const deleteTask = (req, res, next) => {
 
     let query = { _id: req.params.id }
+    console.log(req.params.id);
 
     Task.findOne(query).exec().then(found_task => {
         if (found_task < 1) {
@@ -201,6 +203,104 @@ export const deleteTask = (req, res, next) => {
         });
     });
 }
+
+//count tasks all today
+export const taskCountToday = async (req, res) => {
+    var now = new Date();
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var query = Task.find({
+        created_at: { $gte: startOfToday }
+    });
+    query.countDocuments(function (err, count) {
+        if (err) {
+            console.log(err)
+        }
+        else {
+            return res.status(200).json({
+                count: count
+            });
+        }
+    });
+};
+
+//count tasks all today by id
+export const taskCountTodayByEmp = async (req, res) => {
+    var now = new Date();
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    console.log(req.query.id);
+
+
+    let getemp = {
+        path: 'assignee',
+        match: {
+            _id: req.query.id
+        }
+    }
+    var query = Task.find({
+        created_at: { $gte: startOfToday },
+        assignee: req.query.id
+    });
+
+
+    query.populate(getemp).countDocuments(function (err, count) {
+        if (err) {
+            console.log(err)
+        }
+        else {
+            return res.status(200).json({
+                count: count
+            });
+        }
+    });
+};
+
+//count target all today
+export const targetCountToday = async (req, res) => {
+    var now = new Date();
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var query = Task.aggregate([
+        { $match: { created_at: { $gte: startOfToday } } },
+        { $group: { _id: null, totarget: { $sum: "$target" }, totcompleted: { $sum: "$completed" } } }
+    ])
+    query.then((data) => {
+        if (data.length < 1) {
+            return res.status(402).json({
+                message: " No taskType data found",
+            });
+        } else {
+            return res.status(200).json({
+                data
+            });
+        }
+    });
+};
+
+//count tasks all today by id
+export const targetCountTodayByEmp = async (req, res) => {
+    var now = new Date();
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    console.log("id", req.query.id);
+
+    console.log(startOfToday);
+
+    var query = Task.aggregate([
+        { $match: { created_at: { $gte: startOfToday }, assignee: mongoose.Types.ObjectId(req.query.id) } },
+        { $group: { _id: req.body.id, totarget: { $sum: "$target" }, totcompleted: { $sum: "$completed" } } }
+    ])
+    query.then((data) => {
+        console.log(data);
+
+        if (data.length < 1) {
+            return res.status(402).json({
+                message: " No target data found",
+            });
+        } else {
+            return res.status(200).json({
+                data
+            });
+        }
+    });
+};
 
 //---- TASK TYPES -----//
 
@@ -323,7 +423,7 @@ export const getTaskTypeByid = (req, res, next) => {
 }
 
 
-//delete task
+//delete taskType
 export const deleteTaskType = (req, res, next) => {
 
     let query = { _id: req.params.id }

@@ -37,6 +37,10 @@ router.get('/tskbyemp', userAuth, checkRole(["admin", "manager", "employee"]), t
 router.get('/tsk/:id', userAuth, checkRole(["admin", "manager", "employee"]), taskController.getTaskByid);
 router.patch('/tsk/:id', userAuth, checkRole(["admin", "manager", "employee"]), taskController.updateTask);
 router.delete('/tsk/:id', userAuth, checkRole(["admin", "manager"]), taskController.deleteTask);
+router.get('/countoday', userAuth, checkRole(["admin", "manager"]), taskController.taskCountToday);
+router.get('/targetoday', userAuth, checkRole(["admin", "manager"]), taskController.targetCountToday);
+router.get('/countodaybyemp', userAuth, checkRole(["admin", "manager", "employee"]), taskController.taskCountTodayByEmp);
+router.get('/targetodaybyemp', userAuth, checkRole(["admin", "manager", "employee"]), taskController.targetCountTodayByEmp);
 
 //=========taststypes===========
 router.get('/tsktype', userAuth, checkRole(["admin", "manager"]), taskController.getTaskTypes);

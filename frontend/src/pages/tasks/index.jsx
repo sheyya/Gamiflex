@@ -186,13 +186,13 @@ export const Tasks = (props) => {
         console.log("hi");
 
         let urldata = window.location.pathname.split("/");
-        let userid = urldata[urldata.length - 1];
+        let dataid = urldata[urldata.length - 1];
         console.log(urldata[urldata.length - 2]);
-        userid = jwt(userdatatk).user_id
+        let userid = jwt(userdatatk).user_id
         console.log(role);
 
         if (urldata[urldata.length - 2] === "delete") {
-            showDeleteConfirm(userid);
+            showDeleteConfirm(dataid);
         } else {
 
             if (role == "admin" || role == "manager") {
@@ -241,7 +241,9 @@ export const Tasks = (props) => {
 
             })
             .catch((err) => {
-                message.error({ content: 'Error Occured!', key, duration: 2 });
+                message.error({ content: 'Error Occured!', key, duration: 2 }).then(() => {
+                    props.history.push('/dashboard/tasks')
+                })
             })
     };
 
@@ -312,10 +314,9 @@ export const Tasks = (props) => {
                 const rdata = result.data;
                 console.log(rdata);
 
-                setMeta(result.meta)
                 setData(rdata.map((item) => {
-                    const udate = moment(item.updated_at).format('YY MMM DD - HH:mm')
-                    const deaddate = moment(item.deadline).format('YY MMM DD - HH:mm')
+                    const udate = moment(item.updated_at).format('MMM DD - HH:mm')
+                    const deaddate = moment(item.deadline).format('MMM DD - HH:mm')
 
                     return (
                         {
@@ -343,16 +344,18 @@ export const Tasks = (props) => {
 
     //getall tasks by employee
     const loadtaskbyemp = (params) => {
+        console.log(params);
+
         message.loading({ content: 'Data Loading...', key, duration: 0 })
-        Task.getTaskByEmployee(params)
+        Task.getTaskByEmployee({ id: params })
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
                 console.log(rdata);
 
                 setData(rdata.map((item) => {
-                    const udate = moment(item.updated_at).format('YY MMM DD - HH:mm')
-                    const deaddate = moment(item.deadline).format('YY MMM DD - HH:mm')
+                    const udate = moment(item.updated_at).format('MMM DD - HH:mm')
+                    const deaddate = moment(item.deadline).format('MMM DD - HH:mm')
 
                     return (
                         {
@@ -389,7 +392,7 @@ export const Tasks = (props) => {
 
                     <Row>
                         <Col xs={12}>
-                            <Button
+                            {role == "admin" || role == "manager" ? <Button
                                 onClick={() => {
                                     setModal_addTask(true);
                                     setIsAlertOpen(false);
@@ -399,7 +402,7 @@ export const Tasks = (props) => {
                             >
                                 <i className="ri-user-add-line align-middle"></i>
                                 <span className="mx-2">Add Task</span>
-                            </Button>
+                            </Button> : <></>}
                             {role == "admin" ? <Button
                                 onClick={() => {
                                     setModal_addTaskType(true);
@@ -415,7 +418,7 @@ export const Tasks = (props) => {
                                     <MainTable
                                         meta={meta}
                                         data={data}
-                                        handlePageChange={loadAllTasks}
+                                        handlePageChange={role == "admin" || role == "manager" ? loadAllTasks : loadtaskbyemp}
                                         columns={[
                                             { label: "Task Name", field: "task_type" },
                                             { label: "Department", field: "department" },

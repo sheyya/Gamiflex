@@ -50,7 +50,7 @@ export function SidebarContent(props) {
           <NavLink
             activeClassName="selected"
             to="/dashboard/employees"
-            className=" waves-effect"
+            className=" waves-effect hov"
           >
             <i className="ri-account-circle-line"></i>
             <span className="ml-1">Employees</span>

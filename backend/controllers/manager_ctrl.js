@@ -17,6 +17,7 @@ export const managerLogin = async (req, res) => {
             success: false
         });
     }
+    console.log(password);
 
     // That means manager is existing and trying to signin fro the right portal
     // Now check for the password
@@ -54,4 +55,19 @@ export const managerLogin = async (req, res) => {
             success: false
         });
     }
+};
+
+
+export const managerCount = async (req, res) => {
+    var query = Manager.find();
+    query.countDocuments(function (err, count) {
+        if (err) {
+            console.log(err)
+        }
+        else {
+            return res.status(200).json({
+                count: count
+            });
+        }
+    });
 };
