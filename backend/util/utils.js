@@ -3,6 +3,7 @@ import Task from '../models/tasks.js';
 import mongoose from 'mongoose';
 import moment from "moment"
 import EmpSalary from '../models/empsalary.js';
+import Markslog from '../models/markslog.js';
 
 //get all employees
 export const getEmployees = async () => {
@@ -235,5 +236,32 @@ export const createEmpSalary = async (data) => {
             message: "Unable to create empsalary.",
             success: false
         });
+    }
+};
+
+
+
+//create markslog
+export const createMarkslog = async (data) => {
+    try {
+        const mklDetails = data;
+        const newMarkslog = new Markslog(mklDetails);
+
+        await newMarkslog.save(function (err) {
+            if (err) {
+                console.log(err);
+                console.log("Error happended when creating marks log.");
+
+                return
+            }
+
+            console.log("Markslog successfully logged!");
+
+            return
+        });
+    } catch (err) {
+        // Implement logger function (winston)
+        console.log("Unable to create log.");
+
     }
 };

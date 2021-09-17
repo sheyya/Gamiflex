@@ -5,6 +5,10 @@ import cors from 'cors';
 import passport from 'passport'
 import cron from 'node-cron'
 import moment from "moment"
+import { ANOMALY_DETECTOR_KEY, ANOMALY_DETECTOR_ENDPOINT } from './config/index.js'
+import AnomalyDetectorClient from "@azure/ai-anomaly-detector"
+import TimeGranularity from "@azure/ai-anomaly-detector"
+import AzureKeyCredential from "@azure/core-auth"
 //Import models
 // import Employee from '../models/employee_model.js';
 import * as adminController from './controllers/admin_ctrl.js';
@@ -18,6 +22,7 @@ import employeeRoutes from './routes/employee_route.js';
 import taskRoutes from './routes/tasks_route.js';
 import empsalaryRoutes from './routes/empsalary_route.js';
 import leavereq from './routes/leavereq_route.js';
+import azanomaly from './routes/azanomaly_route.js';
 
 const app = express();
 
@@ -38,11 +43,17 @@ app.use('/employee', employeeRoutes);
 app.use('/tasks', taskRoutes);
 app.use('/empsalary', empsalaryRoutes);
 app.use('/leavereq', leavereq);
+app.use('/azanomaly', azanomaly);
+
+//azure anomaly detector
+// let key = ANOMALY_DETECTOR_KEY;
+// let endpoint = ANOMALY_DETECTOR_ENDPOINT;
+// let anomalyDetectorClient = new AnomalyDetectorClient(endpoint, new AzureKeyCredential(key));
 
 //cron jobs
 cron.schedule('0 30 23 * * *', function () {
     console.log("kk");
-    loaddata()
+    dailylog()
 }, {
     scheduled: true,
     timezone: "Asia/Colombo"
@@ -123,7 +134,7 @@ const clearmarks = () => {
 
 }
 
-const loaddata = () => {
+const dailylog = () => {
     utils.getEmployees().then((result) => {
         console.log(result);
         let rdata = result
@@ -138,7 +149,14 @@ const loaddata = () => {
                         id: data._id,
                         marks: Math.round(item.marks + attendencemark + (data.totcompleted / data.totarget * 100), 0)
                     }
-                    utils.updateEmployee(newdata)
+                    const markslogdata = {
+                        employee: data._id,
+                        marks: Math.round(attendencemark + (data.totcompleted / data.totarget * 100)),
+                        targetot: Math.round(data.totarget),
+                        completedtot: Math.round(data.totcompleted)
+                    }
+                    // utils.updateEmployee(newdata)
+                    utils.createMarkslog(markslogdata)
                 })
             })
                 .catch((err) => {

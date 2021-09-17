@@ -138,7 +138,7 @@ export const getLeaveReqsByEmp = (req, res, next) => {
         }
     }
 
-    LeaveReq.find().populate(query).populate('approved_manager').exec().then(leaveReqs => {
+    LeaveReq.find().populate(query).exec().then(leaveReqs => {
         if (leaveReqs < 1) {
             return res.status(402).json({
                 message: "No leaveReq data found",

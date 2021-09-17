@@ -18,6 +18,7 @@ import {
 } from "reactstrap";
 import { VieweButton } from "../../components/Buttons";
 import { Leaderbord } from "../../components/leaderboard/leaderboard";
+import { Linechart } from "./linechart";
 import Emp from "../../controllers/employee";
 import Mngr from "../../controllers/manager";
 import Tsk from "../../controllers/task";
@@ -281,6 +282,11 @@ export function Overview(props) {
                         </Col>
                     </Row>
                     <Row>
+                        <Col lg={10}>
+                            <Linechart />
+                        </Col>
+                    </Row>
+                    <Row lg={10}>
                         <div className="page-title-box">
                             <h4 className="mb-0">Leaderboard</h4>
                         </div>
@@ -291,6 +297,7 @@ export function Overview(props) {
                             </Col>
                         </div>
                     </Row>
+
                 </Container>
             </div>
         </React.Fragment>

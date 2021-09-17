@@ -416,7 +416,6 @@ export const Tasks = (props) => {
                             <Card>
                                 <CardBody>
                                     <MainTable
-                                        meta={meta}
                                         data={data}
                                         handlePageChange={role == "admin" || role == "manager" ? loadAllTasks : loadtaskbyemp}
                                         columns={[

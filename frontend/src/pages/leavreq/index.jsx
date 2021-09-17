@@ -254,7 +254,7 @@ export const LeaveReqs = (props) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         console.log(params);
 
-        LeaveReq.getLeaveReqByEmployee(params)
+        LeaveReq.getLeaveReqByEmployee({ id: params })
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;

@@ -27,6 +27,7 @@ export const Leaderbord = () => {
     let mngr_mid;
     const [udata, setUData] = useState([]);
     const [newudata, setNewUData] = useState([]);
+    const [monthudata, setMonthUData] = useState([]);
 
 
     useEffect(() => {
@@ -75,12 +76,13 @@ export const Leaderbord = () => {
     const loadAllEmployees = (params) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         Admin.getAllEmployees(params)
-            .then((result) => {
+            .then(async (result) => {
                 console.log("wait");
 
                 const rdata = result.data;
                 console.log(rdata);
                 setUData([])
+                setMonthUData([])
                 rdata.map((item) => {
 
                     Tsk.getTargetCountTodaybyEmp({ id: item._id }).then(async (result) => {
@@ -109,8 +111,24 @@ export const Leaderbord = () => {
                     })
                         .catch((err) => {
                             console.log(err);
+                            message.warning({ content: 'No Daily Data Found!', key, duration: 2 });
                         });
+
                 })
+
+                const mdata = rdata.map((item) => {
+                    return (
+                        {
+                            id: item._id,
+                            name: `${item.fname} ${item.lname}`,
+                            member_id: item.member_id,
+                            marks: item.marks
+                        }
+                    )
+                })
+                await mdata.sort((a, b) => b.marks - a.marks);
+                setMonthUData(prevState => ([...prevState, ...mdata]))
+
 
             })
             .catch((err) => {
@@ -124,7 +142,7 @@ export const Leaderbord = () => {
     return (
         <div className="leaderboard">
             <div className="l-grid">
-                {role == "employee" ? <div className="l-grid__item l-grid__item--sticky">
+                {/* {role == "employee" ? <div className="l-grid__item l-grid__item--sticky">
                     <div className="c-card u-bg--light-gradient u-text--dark">
                         <div className="c-card__body">
                             <div className="u-display--flex u-justify--space-between">
@@ -144,7 +162,7 @@ export const Leaderbord = () => {
                             <div className="u-text--center" id="winner"></div>
                         </div>
                     </div>
-                </div> : <></>}
+                </div> : <></>} */}
                 <div className="l-grid__item">
                     <div className="c-card">
                         <div className="c-card__header">
@@ -184,7 +202,7 @@ export const Leaderbord = () => {
                                                     <div className="c-media">
                                                         <div className="c-media__content">
                                                             <div className="c-media__title">{userd.name}</div>
-                                                            <a className="c-media__link u-text--small" href={`/dashboard/employee/view/${userd.id}`} >{userd.member_id}</a>
+                                                            <a className="c-media__link u-text--small" href={role == "admin" ? `/dashboard/employee/view/${userd.id}` : ""} >{userd.member_id}</a>
                                                         </div>
                                                     </div>
                                                     <div className={newclassmarks}>
@@ -200,6 +218,62 @@ export const Leaderbord = () => {
                         </div>
                     </div>
                 </div>
+                <div className="l-grid__item">
+                    <div className="c-card">
+                        <div className="c-card__header">
+                            <h3 style={{ color: "#ffffff" }}>Monthly Leaderboard</h3>
+                            <select className="c-select">
+                                <option selected="selected">{moment().format("DD MMM YYYY")}</option>
+                            </select>
+                        </div>
+                        <div className="c-card__body">
+                            <ul className="c-list" id="list">
+                                <li className="c-list__item">
+                                    <div className="c-list__grid">
+                                        <div className="u-text--left u-text--small u-text--medium">Rank</div>
+                                        <div className="u-text--left u-text--small u-text--medium">Employee</div>
+                                        <div className="u-text--right u-text--small u-text--medium">Marks</div>
+                                    </div>
+                                </li>
+                                {
+
+                                    monthudata.map((userd, index) => {
+                                        let newclassrank = "c-flag c-place u-bg--transparent";
+                                        let newclassmarks = "u-text--right c-kudos";
+                                        if (index + 1 === 1) {
+                                            newclassrank = 'c-flag c-place u-text--dark u-bg--yellow'
+                                            newclassmarks = 'u-text--right c-kudos u-text--yellow'
+                                        } else if (index + 1 === 2) {
+                                            newclassrank = 'c-flag c-place u-text--dark u-bg--teal'
+                                            newclassmarks = 'u-text--right c-kudos u-text--teal'
+                                        } else if (index + 1 === 3) {
+                                            newclassrank = 'c-flag c-place u-text--dark u-bg--orange'
+                                            newclassmarks = 'u-text--right c-kudos u-text--orange'
+                                        }
+                                        return (
+                                            <li className="c-list__item">
+                                                <div className="c-list__grid">
+                                                    <div className={newclassrank}>{index + 1}</div>
+                                                    <div className="c-media">
+                                                        <div className="c-media__content">
+                                                            <div className="c-media__title">{userd.name}</div>
+                                                            <a className="c-media__link u-text--small" href={role == "admin" ? `/dashboard/employee/view/${userd.id}` : ""} >{userd.member_id}</a>
+                                                        </div>
+                                                    </div>
+                                                    <div className={newclassmarks}>
+                                                        <div className="u-mt--8">
+                                                            <strong>{userd.marks}</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>)
+                                    })
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     )

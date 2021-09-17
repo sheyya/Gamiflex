@@ -62,7 +62,6 @@ class LeaveReq {
   }
 
   async getLeaveReqByEmployee(data) {
-    console.log(data);
 
     const config = {
       headers: { Authorization: `${localStorage.getItem('usertoken')}` },
