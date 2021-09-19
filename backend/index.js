@@ -138,38 +138,38 @@ const clearmarks = () => {
 
 const dailylog = () => {
     utils.createTotTC()
-    // utils.getEmployees().then((result) => {
-    //     console.log(result);
-    //     let rdata = result
-    //     rdata.map((item) => {
-    //         utils.targetCountTodayByEmp(item._id).then(async (result) => {
-    //             const out = result
-    //             // console.log(out[0].totarget);
+    utils.getEmployees().then((result) => {
+        console.log(result);
+        let rdata = result
+        rdata.map((item) => {
+            utils.targetCountTodayByEmp(item._id).then(async (result) => {
+                const out = result
+                // console.log(out[0].totarget);
 
-    //             out.map((data) => {
-    //                 const attendencemark = 5;
-    //                 const newdata = {
-    //                     id: data._id,
-    //                     marks: Math.round(item.marks + attendencemark + (data.totcompleted / data.totarget * 100), 0)
-    //                 }
-    //                 const markslogdata = {
-    //                     employee: data._id,
-    //                     marks: Math.round(attendencemark + (data.totcompleted / data.totarget * 100)),
-    //                     targetot: Math.round(data.totarget),
-    //                     completedtot: Math.round(data.totcompleted)
-    //                 }
-    //                 // utils.updateEmployee(newdata)
-    //                 utils.createMarkslog(markslogdata)
-    //             })
-    //         })
-    //             .catch((err) => {
-    //                 console.log(err);
-    //             });
-    //     })
+                out.map((data) => {
+                    const attendencemark = 5;
+                    const newdata = {
+                        id: data._id,
+                        marks: Math.round(item.marks + attendencemark + (data.totcompleted / data.totarget * 100), 0)
+                    }
+                    const markslogdata = {
+                        employee: data._id,
+                        marks: Math.round(attendencemark + (data.totcompleted / data.totarget * 100)),
+                        targetot: Math.round(data.totarget),
+                        completedtot: Math.round(data.totcompleted)
+                    }
+                    // utils.updateEmployee(newdata)
+                    utils.createMarkslog(markslogdata)
+                })
+            })
+                .catch((err) => {
+                    console.log(err);
+                });
+        })
 
-    // }).catch((err) => {
-    //     console.log(err);
-    // })
+    }).catch((err) => {
+        console.log(err);
+    })
 
 }
 
