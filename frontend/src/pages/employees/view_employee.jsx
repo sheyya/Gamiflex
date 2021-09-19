@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AvForm, AvField, AvInput } from "availity-reactstrap-validation";
 import { Link, RouteComponentProps, useLocation } from "react-router-dom";
 import "./users.scss";
+import { Linechart } from "../../components/linechart";
 import {
     Row,
     Col,
@@ -105,7 +106,7 @@ const Employee = (props) => {
         // const userid = location.state.id;
         // const isEdit = location.state.edit;
         let urldata = window.location.pathname.split("/");
-        let userid = urldata[urldata.length - 1];
+        let userid = (urldata[urldata.length - 1])
         console.log(urldata[urldata.length - 2]);
 
         loadEmployee(userid)
@@ -300,6 +301,18 @@ const Employee = (props) => {
 
     }
 
+    const showchart = () => {
+        let urldata = window.location.pathname.split("/");
+        let userid = urldata[urldata.length - 1];
+        console.log("sj-", userid);
+
+        return (<Row>
+            <Col lg={10}>
+                <Linechart empid={userid} />
+            </Col>
+        </Row>)
+    }
+
     const updateBonus = async () => {
         message.loading({ content: 'Updating Bonus...', key, duration: 0 })
         let urldata = window.location.pathname.split("/");
@@ -362,6 +375,7 @@ const Employee = (props) => {
                                 </Col>
                             </div>
                         </Row>
+                        {showchart()}
                         <Col lg="6">
                             <Card>
                                 <CardBody>

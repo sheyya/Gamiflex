@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import moment from "moment"
 import EmpSalary from '../models/empsalary.js';
 import Markslog from '../models/markslog.js';
+import totalTC from '../models/totaltc_model.js';
 
 //get all employees
 export const getEmployees = async () => {
@@ -239,8 +240,6 @@ export const createEmpSalary = async (data) => {
     }
 };
 
-
-
 //create markslog
 export const createMarkslog = async (data) => {
     try {
@@ -259,6 +258,53 @@ export const createMarkslog = async (data) => {
 
             return
         });
+    } catch (err) {
+        // Implement logger function (winston)
+        console.log("Unable to create log.");
+
+    }
+};
+
+
+//create total targets completed
+export const createTotTC = async (data) => {
+    let totdata;
+    try {
+
+        var now = new Date();
+        var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var query = Task.aggregate([
+            { $match: { created_at: { $gte: startOfToday } } },
+            { $group: { _id: null, targetot: { $sum: "$target" }, completedtot: { $sum: "$completed" } } }
+        ])
+        await query.then((data) => {
+
+            console.log("--data", data);
+
+            if (data.length < 1) {
+                console.log(" No taskType data found");
+
+            } else {
+                totdata = data;
+            }
+        }).then(() => {
+            console.log(totdata);
+            // let sendnewdata = {
+
+            // }
+            const newTotTC = new totalTC(totdata[0]);
+            newTotTC.save(function (err) {
+                if (err) {
+                    console.log(err);
+                    console.log("Error happended when creating marks log.");
+                    return
+                }
+                console.log("TotTC successfully logged!");
+                return
+            });
+        })
+
+
     } catch (err) {
         // Implement logger function (winston)
         console.log("Unable to create log.");

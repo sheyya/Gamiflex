@@ -44,30 +44,53 @@ export const azChangePointDetect = async function (req, res, next) {
         granularity: 'daily'
     };
 
+    // get anomalies
+    await client.detectEntireSeries(request).then((response) => {
+        let changedarr = [];
+        console.log("Anomaly detected from the series");
+        console.log(response);
 
-    // get change point detect results
-    const result = await client.detectChangePoint(request);
-    const isChangePointDetected = result.isChangePoint.some((changePoint) => changePoint);
-    let changedarr = [];
-    if (isChangePointDetected) {
-        console.log("Change points were detected from the series at index:");
-        result.isChangePoint.forEach((changePoint, index) => {
-            if (changePoint === true) {
-                console.log(index);
-                changedarr.push(index)
+        for (let item = 0; item < response.isAnomaly.length; item++) {
+            if (response.isAnomaly[item]) {
+                console.log("An anomaly was detected from the series, at row " + item)
+                changedarr.push(item)
             }
-        });
+        }
         return res.status(200).json({
             success: true,
             code: 200,
             data: changedarr,
         });
-    } else {
-        console.log("There is no change point detected from the series.");
-        return res.status(402).json({
-            message: "There is no change point detected from the series.e",
-        });
-    }
+    }).catch((error) => {
+        console.log(error)
+    })
+
+
+    // get change point detect results
+    // const result = await client.detectChangePoint(request);
+    // const isChangePointDetected = result.isChangePoint.some((changePoint) => changePoint);
+    // let changedarr = [];
+    // if (isChangePointDetected) {
+    //     console.log("Change points were detected from the series at index:");
+    //     result.isChangePoint.forEach((changePoint, index) => {
+    //         if (changePoint === true) {
+    //             console.log(index);
+    //             changedarr.push(index)
+    //         }
+    //     });
+    //     return res.status(200).json({
+    //         success: true,
+    //         code: 200,
+    //         data: changedarr,
+    //     });
+    // } else {
+    //     console.log("There is no change point detected from the series.");
+    //     return res.status(402).json({
+    //         message: "There is no change point detected from the series.e",
+    //     });
+    // }
+
+
     // output:
     // Change points were detected from the series at index:
     // 9
