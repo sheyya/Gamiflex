@@ -86,7 +86,7 @@ const Admin_Signin = () => {
                                   </Link>
                                 </div>
 
-                                <h4 className="font-size-18 mt-2 badge bg-gami">Admin Login</h4>
+                                <h4 className="font-size-18 mt-2 badge text-dark bg-gami">Admin Login</h4>
                               </div>
 
                               {error && error ? <Alert color="danger">{error}</Alert> : null}
@@ -151,7 +151,7 @@ const Admin_Signin = () => {
                                       disabled={loading}
                                     >
                                       Log In
-                              </Button>
+                                    </Button>
                                   </div>
 
                                   {/* <div className="mt-4 text-center">

@@ -47,7 +47,7 @@ const Home = () => {
                                   </Link>
                                 </div>
 
-                                <h4 className="font-size-18 mt-2 badge bg-gami">Please Select a Portal</h4>
+                                <h4 className="font-size-18 mt-2 badge text-dark bg-gami">Please Select a Portal</h4>
                               </div>
 
                               <div className="p-2 mt-3">
@@ -58,7 +58,7 @@ const Home = () => {
                                     onClick={() => { history.push('/login/admin') }}
                                   >
                                     Admin Portal
-                              </Button>
+                                  </Button>
                                 </div>
                                 <div className="mt-4 text-center">
                                   <Button
@@ -66,7 +66,7 @@ const Home = () => {
                                     onClick={() => { history.push('/login/manager') }}
                                   >
                                     Manager Portal
-                              </Button>
+                                  </Button>
                                 </div>
                                 <div className="mt-4 text-center">
                                   <Button
@@ -74,7 +74,7 @@ const Home = () => {
                                     onClick={() => { history.push('/login/employee') }}
                                   >
                                     Employee Portal
-                              </Button>
+                                  </Button>
                                 </div>
                               </div>
                             </div>

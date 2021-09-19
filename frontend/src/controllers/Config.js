@@ -5,9 +5,9 @@ class Config {
   constructor() {
     //backend server details
 
-    this.host = "http://localhost";
+    this.host = "https://gamiflex-backend2.azurewebsites.net/";
 
-    this.port = ":5000/";
+    this.port = "";
   }
 
 }

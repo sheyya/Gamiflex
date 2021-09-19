@@ -89,7 +89,7 @@ const Manager_Signin = () => {
                                   </Link>
                                 </div>
 
-                                <h4 className="font-size-18 mt-2 badge bg-gami">Manager Login</h4>
+                                <h4 className="font-size-18 mt-2 badge text-dark bg-gami">Manager Login</h4>
                               </div>
 
                               {error && error ? <Alert color="danger">{error}</Alert> : null}
@@ -153,7 +153,7 @@ const Manager_Signin = () => {
                                       type="submit"
                                     >
                                       Log In
-                              </Button>
+                                    </Button>
                                   </div>
 
                                   {/* <div className="mt-4 text-center">
