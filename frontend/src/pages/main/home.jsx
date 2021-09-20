@@ -27,14 +27,14 @@ const Home = () => {
       <div>
         <Container className="p-0">
           <Row className="no-gutters">
-            <Col lg={12}>
+            <Col lg={12} className="nopadblock">
               <div className="authentication-page-content p-4 d-flex align-items-center min-vh-100">
                 <div className="w-100">
                   <Col lg={12} className="shadow rounded-3 p-5">
                     <Row className="p-5">
                       <Col lg={8}>
                         <h1 className="text-center my-5 fw-bold">WELCOME!</h1>
-                        <img src={welcome} alt="Welcome" />
+                        <img src={welcome} style={{ width: "100%" }} alt="Welcome" />
                       </Col>
                       <Col lg={4} className="my-auto">
                         <Row className="justify-content-center">

@@ -76,7 +76,7 @@ const Manager_Signin = () => {
                     <Row className="p-5">
                       <Col lg={8}>
                         <h1 className="text-center my-5 fw-bold">WELCOME!</h1>
-                        <img src={welcome} alt="Welcome" />
+                        <img src={welcome} style={{ width: "100%" }} alt="Welcome" />
                       </Col>
                       <Col lg={4} className="my-auto">
                         <Row className="justify-content-center">
