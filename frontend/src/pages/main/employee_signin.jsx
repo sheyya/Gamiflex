@@ -159,7 +159,7 @@ const Employee_Signin = () => {
                                       className="w-50 waves-effect bg-gami waves-light"
                                       type="submit"
                                     >
-                                      Log In
+                                      {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : "Log In"}
                                     </Button>
                                   </div>
 
