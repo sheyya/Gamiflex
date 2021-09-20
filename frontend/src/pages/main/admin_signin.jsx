@@ -69,8 +69,8 @@ const Admin_Signin = () => {
             <Col lg={12}>
               <div className="authentication-page-content p-4 d-flex align-items-center min-vh-100">
                 <div className="w-100">
-                  <Col lg={12} className="shadow rounded-3 p-5">
-                    <Row className="p-5">
+                  <Col lg={12} className="shadow rounded-3 p-5 nopadblock2">
+                    <Row className="p-5 nopadblock">
                       <Col lg={8}>
                         <h1 className="text-center my-5 fw-bold">WELCOME!</h1>
                         <img src={welcome} style={{ width: "100%" }} alt="Welcome" />
@@ -150,7 +150,7 @@ const Admin_Signin = () => {
                                       type="submit"
                                       disabled={loading}
                                     >
-                                      Log In
+                                      {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : "Log In"}
                                     </Button>
                                   </div>
 

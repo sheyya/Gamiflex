@@ -307,6 +307,14 @@ input.form-control:focus {
   margin-top: 8px !important;
 }
 
-.nopadblock{
-  padding: 0 !important;
+@media screen and (max-width: 372px) {
+  .nopadblock2{
+    padding: 0 !important;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .nopadblock{
+    padding: 0 !important;
+  }
 }

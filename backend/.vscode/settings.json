@@ -1,8 +1,8 @@
 {
-    "appService.defaultWebAppToDeploy": "/subscriptions/bed098b2-8dd3-4d20-a5fa-faa378f633c6/resourceGroups/gamiflex/providers/Microsoft.Web/sites/gamiflex-backend",
     "appService.deploySubpath": ".",
     "appService.zipIgnorePattern": [
         "node_modules{,/**}",
         ".vscode{,/**}"
-    ]
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/bed098b2-8dd3-4d20-a5fa-faa378f633c6/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/gamiflex-backend2"
 }
