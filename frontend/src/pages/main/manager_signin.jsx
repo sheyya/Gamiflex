@@ -16,9 +16,10 @@ import { withRouter } from 'react-router-dom'
 // import images
 import logodark from "../../assets/images/logo-dark.png";
 import welcome from "../../assets/images/welcome.png";
+import useAuth from "../../useAuth";
 
 const Manager_Signin = () => {
-
+  const { loginUser, loading } = useAuth();
   const [usernameval, setUsernameval] = useState("");
   const [passval, setPassval] = useState("");
   const [error, setError] = useState("");
@@ -38,7 +39,7 @@ const Manager_Signin = () => {
     e.preventDefault();
 
     //call login controller function
-    var status = await Manager.userSignIn(
+    var status = await loginUser(Manager,
       usernameval,
       passval
     );
@@ -151,6 +152,7 @@ const Manager_Signin = () => {
                                     <Button
                                       className="w-50 waves-effect bg-gami waves-light"
                                       type="submit"
+                                      disabled={loading}
                                     >
                                       {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : "Log In"}
                                     </Button>

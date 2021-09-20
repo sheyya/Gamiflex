@@ -32,7 +32,7 @@ import jwt from 'jwt-decode'
 const Task = (props) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownOpenGroup, setDropdownOpenGroup] = useState(false);
-    const [dropdownOpenWallet, setDropdownOpenWallet] = useState(false);
+    const [changeCompletedVal, setChangeCompletedVal] = useState(false);
     const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
     const toggleDropdownGroup = () => setDropdownOpenGroup((prevState) => !prevState);
     const toggleDropdownWallet = () => setDropdownOpenWallet((prevState) => !prevState);
@@ -129,7 +129,7 @@ const Task = (props) => {
     // handle task completd
     const handleChangeCompleted = (value) => {
         console.log(value);
-
+        setChangeCompletedVal(true)
         setTaskData(
             {
                 ...taskdata, completed: value
@@ -256,6 +256,9 @@ const Task = (props) => {
         ) {
             console.log(taskdata);
             if (taskdata.target == taskdata.completed) { taskdata.status = "completed" }
+            if (role !== "employee" && changeCompletedVal && taskdata.completedbyEmp > 0) {
+                taskdata.completedbyEmp = 0;
+            }
             Tasks.updateTasks(taskdata).then((response) => {
                 console.log(response);
                 message.success({ content: 'Data Updated Successfully', key, duration: 2 }).then(() => {
