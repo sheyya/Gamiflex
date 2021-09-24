@@ -1,9 +1,12 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import passport from 'passport'
 import cron from 'node-cron'
+var CronJob = require('cron').CronJob;
 import moment from "moment"
 import { ANOMALY_DETECTOR_KEY, ANOMALY_DETECTOR_ENDPOINT } from './config/index.js'
 import AnomalyDetectorClient from "@azure/ai-anomaly-detector"
@@ -53,29 +56,67 @@ app.use('/datalog', datalog);
 // let anomalyDetectorClient = new AnomalyDetectorClient(endpoint, new AzureKeyCredential(key));
 
 //cron jobs
-cron.schedule('00 37 00 * * *', function () {
-    console.log("kk");
-    dailylog()
-}, {
-    scheduled: true,
-    timezone: "Asia/Colombo"
-});
 
-cron.schedule('0 30 23 27 * *', function () {
-    // console.log("kk");
-    savesalary()
-}, {
-    scheduled: true,
-    timezone: "Asia/Colombo"
-});
+const dailycron = new CronJob(
+    '00 20 04 * * *', //cron time
+    function () {
+        console.log("kk");
+        // dailylog()
+    }, //replace with your function that you want to call
+    null, //oncomplete
+    false, //start flag
+    'Asia/Colombo',// timezone
+);
 
-cron.schedule('0 0 0 28 * *', function () {
-    // console.log("kk");
-    clearmarks()
-}, {
-    scheduled: true,
-    timezone: "Asia/Colombo"
-});
+const monthlycron = new CronJob(
+    '0 30 23 27 * *', //cron time
+    function () {
+        // console.log("kk");
+        savesalary()
+    }, //replace with your function that you want to call
+    null, //oncomplete
+    false, //start flag
+    'Asia/Colombo',// timezone
+);
+
+const monthlycronclear = new CronJob(
+    '0 0 0 28 * *', //cron time
+    function () {
+        // console.log("kk");
+        clearmarks()
+    }, //replace with your function that you want to call
+    null, //oncomplete
+    false, //start flag
+    'Asia/Colombo',// timezone
+);
+
+dailycron.start()
+monthlycron.start()
+monthlycronclear.start()
+
+// cron.schedule('00 37 00 * * *', function () {
+//     console.log("kk");
+//     dailylog()
+// }, {
+//     scheduled: true,
+//     timezone: "Asia/Colombo"
+// });
+
+// cron.schedule('0 30 23 27 * *', function () {
+//     // console.log("kk");
+//     savesalary()
+// }, {
+//     scheduled: true,
+//     timezone: "Asia/Colombo"
+// });
+
+// cron.schedule('0 0 0 28 * *', function () {
+//     // console.log("kk");
+//     clearmarks()
+// }, {
+//     scheduled: true,
+//     timezone: "Asia/Colombo"
+// });
 
 const savesalary = async () => {
     let marksarr
