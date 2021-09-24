@@ -78,12 +78,12 @@ export const adminLogin = async (req, res) => {
 
     // That means admin is existing and trying to signin fro the right portal
     // Now check for the password
-    console.log(password);
-    console.log(admin.password);
+    // console.log(password);
+    // console.log(admin.password);
     let isMatch = await bcrypt.compare(password, admin.password);
-    console.log(isMatch);
+    // console.log(isMatch);
     if (isMatch) {
-        console.log(admin.member_id);
+        // console.log(admin.member_id);
 
         // Sign in the token and issue it to the admin
         let token = jwt.sign(
@@ -129,7 +129,7 @@ export const createEmployee = async (req, res) => {
         const empDetails = req.body;
         // Validate the username
         let usernameNotTaken = await validateUsername(empDetails.username, Employee);
-        console.log(usernameNotTaken);
+        // console.log(usernameNotTaken);
         if (!usernameNotTaken) {
             res.status(400).json({
                 message: `Username is already taken.`,
@@ -147,7 +147,7 @@ export const createEmployee = async (req, res) => {
             });
             return;
         }
-        console.log(empDetails);
+        // console.log(empDetails);
 
         // Get the hashed password
         const password = await bcrypt.hash(empDetails.pass, 12);
@@ -210,7 +210,7 @@ export const getEmployees = function (req, res, next) {
 export const updateEmployee = async (req, res, next) => {
     let pass;
     let query = { _id: req.params.id }
-    console.log(req.body.pass);
+    // console.log(req.body.pass);
 
     if (req.body.username) {
         pass = await bcrypt.hash(req.body.pass, 12);

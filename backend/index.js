@@ -53,8 +53,8 @@ app.use('/datalog', datalog);
 // let anomalyDetectorClient = new AnomalyDetectorClient(endpoint, new AzureKeyCredential(key));
 
 //cron jobs
-cron.schedule('0 30 23 * * *', function () {
-    console.log("kk");
+cron.schedule('00 30 23 * * *', function () {
+    // console.log("kk");
     dailylog()
 }, {
     scheduled: true,
@@ -62,7 +62,7 @@ cron.schedule('0 30 23 * * *', function () {
 });
 
 cron.schedule('0 30 23 27 * *', function () {
-    console.log("kk");
+    // console.log("kk");
     savesalary()
 }, {
     scheduled: true,
@@ -70,7 +70,7 @@ cron.schedule('0 30 23 27 * *', function () {
 });
 
 cron.schedule('0 0 0 28 * *', function () {
-    console.log("kk");
+    // console.log("kk");
     clearmarks()
 }, {
     scheduled: true,
@@ -80,7 +80,7 @@ cron.schedule('0 0 0 28 * *', function () {
 const savesalary = async () => {
     let marksarr
     await utils.getEmployees().then((result) => {
-        console.log(result);
+        // console.log(result);
         let rdata = result
         marksarr = rdata.map((item) => {
             return (
@@ -96,7 +96,7 @@ const savesalary = async () => {
     })
 
     await marksarr.sort((a, b) => b.marks - a.marks);
-    console.log(marksarr);
+    // console.log(marksarr);
     marksarr.map((mk, index) => {
         let reward;
         if (index == 0) { reward = 5000 }
@@ -115,7 +115,7 @@ const savesalary = async () => {
 
 const clearmarks = () => {
     utils.getEmployees().then((result) => {
-        console.log(result);
+        // console.log(result);
         let rdata = result
         rdata.map((item) => {
             const newdata = {
@@ -130,7 +130,7 @@ const clearmarks = () => {
         })
 
     }).catch((err) => {
-        console.log(err);
+        // console.log(err);
     })
 
 
@@ -139,7 +139,7 @@ const clearmarks = () => {
 const dailylog = () => {
     utils.createTotTC()
     utils.getEmployees().then((result) => {
-        console.log(result);
+        // console.log(result);
         let rdata = result
         rdata.map((item) => {
             utils.targetCountTodayByEmp(item._id).then(async (result) => {
@@ -158,7 +158,9 @@ const dailylog = () => {
                         targetot: Math.round(data.totarget),
                         completedtot: Math.round(data.totcompleted)
                     }
-                    // utils.updateEmployee(newdata)
+                    utils.updateEmployee(newdata)
+                    console.log(markslogdata);
+
                     utils.createMarkslog(markslogdata)
                 })
             })

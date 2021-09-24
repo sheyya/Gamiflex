@@ -10,8 +10,8 @@ let endpoint = ANOMALY_DETECTOR_ENDPOINT;
 
 export const azChangePointDetect = async function (req, res, next) {
     // create client
-    console.log(key);
-    console.log(endpoint);
+    // console.log(key);
+    // console.log(endpoint);
 
     const client = new AnomalyDetectorClient(endpoint, new AzureKeyCredential(key));
 
@@ -36,7 +36,7 @@ export const azChangePointDetect = async function (req, res, next) {
     //     ],
     //     granularity: TimeGranularity.daily
     //   };
-    console.log(req.body);
+    // console.log(req.body);
 
 
     const request = {
@@ -47,12 +47,12 @@ export const azChangePointDetect = async function (req, res, next) {
     // get anomalies
     await client.detectEntireSeries(request).then((response) => {
         let changedarr = [];
-        console.log("Anomaly detected from the series");
-        console.log(response);
+        // console.log("Anomaly detected from the series");
+        // console.log(response);
 
         for (let item = 0; item < response.isAnomaly.length; item++) {
             if (response.isAnomaly[item]) {
-                console.log("An anomaly was detected from the series, at row " + item)
+                // console.log("An anomaly was detected from the series, at row " + item)
                 changedarr.push(item)
             }
         }

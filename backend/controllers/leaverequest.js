@@ -5,7 +5,7 @@ import LeaveReq from '../models/leaverequest_model.js';
 export const createLeaveReq = async (req, res) => {
     try {
         const lrqDetails = req.body;
-        console.log(req.body);
+        // console.log(req.body);
         const newLeaveReq = new LeaveReq(lrqDetails);
 
 
@@ -43,7 +43,7 @@ export const getLeaveReqs = function (req, res, next) {
                     message: "No leaveReqs data availble",
                 });
             } else {
-                console.log(user);
+                // console.log(user);
 
                 return res.status(200).json({
                     success: true,
@@ -128,8 +128,8 @@ export const getLeaveReqByid = (req, res, next) => {
 
 //get filtered leaveReqs by employee
 export const getLeaveReqsByEmp = (req, res, next) => {
-    console.log(req.query.id);
-    console.log("tt");
+    // console.log(req.query.id);
+    // console.log("tt");
 
     let query = {
         path: 'employee_id',

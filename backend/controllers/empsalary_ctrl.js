@@ -44,7 +44,7 @@ export const getEmpSalarys = function (req, res, next) {
                     message: "No empsalarys data availble",
                 });
             } else {
-                console.log(user);
+                // console.log(user);
 
                 return res.status(200).json({
                     success: true,
@@ -63,7 +63,7 @@ export const getEmpSalarys = function (req, res, next) {
 
 // update empsalaryType
 export const updateEmpSalary = async (req, res, next) => {
-    console.log(req.query.id);
+    // console.log(req.query.id);
     let query = { _id: req.query.id }
     EmpSalary.findOne(query).exec().then(found_empsalary => {
         if (found_empsalary < 1) {
@@ -132,7 +132,7 @@ export const getEmpSalaryByid = (req, res, next) => {
 
 //get filtered empsalarys by employee
 export const getEmpSalarysByEmp = (req, res, next) => {
-    console.log(req.query.id);
+    // console.log(req.query.id);
     let query = {
         path: 'employee_id',
         match: {

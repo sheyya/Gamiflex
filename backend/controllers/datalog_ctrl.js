@@ -29,7 +29,7 @@ export const getAllTotalTC = function (req, res, next) {
 
 //get filtered leaveReqs by employee
 export const getMarksByEmp = (req, res, next) => {
-    console.log("---id", req.query.empid);
+    // console.log("---id", req.query.empid);
 
     let query = {
         path: 'employee',

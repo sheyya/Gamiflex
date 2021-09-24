@@ -17,7 +17,7 @@ export const managerLogin = async (req, res) => {
             success: false
         });
     }
-    console.log(password);
+    // console.log(password);
 
     // That means manager is existing and trying to signin fro the right portal
     // Now check for the password

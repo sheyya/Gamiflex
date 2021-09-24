@@ -31,7 +31,7 @@ export const targetCountTodayByEmp = async (data) => {
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
 
-    console.log(startOfToday);
+    // console.log(startOfToday);
 
     var query = Task.aggregate([
         { $match: { created_at: { $gte: startOfToday }, assignee: mongoose.Types.ObjectId(data) } },
@@ -54,7 +54,7 @@ export const targetCountTodayByEmp = async (data) => {
 export const updateEmployee = async (data) => {
 
     let query = { _id: data.id }
-    console.log(data);
+    // console.log(data);
 
     Employee.findOne(query).exec().then(found_employee => {
         if (found_employee < 1) {
@@ -79,7 +79,7 @@ export const updateEmployee = async (data) => {
             if (data.member_id) { found_employee.member_id = data.member_id }
             if (data.role) { found_employee.role = data.role }
             if (data.marks !== 'undefined') { found_employee.marks = data.marks }
-            console.log(found_employee.marks);
+            // console.log(found_employee.marks);
 
             found_employee.save((err, updated_object) => {
                 if (err) { return next(err) }
@@ -100,7 +100,7 @@ export const updateEmployee = async (data) => {
 
 //get filtered empsalarys by employee
 export const getEmpSalarysByEmp = async (data) => {
-    console.log(data.id);
+    // console.log(data.id);
     let query = {
         path: 'employee_id',
         match: {
@@ -144,7 +144,7 @@ export const updateEmpSalary = async (data) => {
             });
             let startday = moment().subtract(1, 'months').startOf('month').date(28).format('YYYY-MM-DD hh:mm')
             let endday = moment().date(27).format('YYYY-MM-DD hh:mm')
-            console.log(startday, "----", endday);
+            // console.log(startday, "----", endday);
 
             tasks.map((item) => {
                 if (moment(item.deadline).isBetween(startday, endday)) {
@@ -166,8 +166,8 @@ export const updateEmpSalary = async (data) => {
         });
     });
 
-    console.log("totsal- ", tempsalary);
-    console.log(data.id);
+    // console.log("totsal- ", tempsalary);
+    // console.log(data.id);
     let query = {
         path: 'employee_id',
         match: {
@@ -185,7 +185,6 @@ export const updateEmpSalary = async (data) => {
         } else {
             found_empsalary.map((emps) => {
                 if (emps.month == data.month) {
-                    console.log("ok", emps);
                     let totbonus = emps.bonus + data.bonus;
                     let totsalary = (totbonus + tempsalary);
                     let totepf = totsalary / 100 * 20;
@@ -279,7 +278,7 @@ export const createTotTC = async (data) => {
         ])
         await query.then((data) => {
 
-            console.log("--data", data);
+            // console.log("--data", data);
 
             if (data.length < 1) {
                 console.log(" No taskType data found");
@@ -288,7 +287,7 @@ export const createTotTC = async (data) => {
                 totdata = data;
             }
         }).then(() => {
-            console.log(totdata);
+            // console.log(totdata);
             // let sendnewdata = {
 
             // }

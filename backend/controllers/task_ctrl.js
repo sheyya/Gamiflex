@@ -9,6 +9,8 @@ import mongoose from 'mongoose';
 export const createTask = async (req, res) => {
     try {
         const tskDetails = req.body;
+        console.log(tskDetails);
+
         const newTask = new Task(tskDetails);
 
         await newTask.save(function (err) {
@@ -145,7 +147,7 @@ export const getTasksByEmp = (req, res, next) => {
             _id: req.query.id
         }
     }
-    console.log(req.query.id);
+    // console.log(req.query.id);
 
     Task.find({ assignee: req.query.id }).populate('manager assignee task_type').exec().then(tasks => {
         if (tasks < 1) {
@@ -175,7 +177,7 @@ export const getTasksByEmp = (req, res, next) => {
 export const deleteTask = (req, res, next) => {
 
     let query = { _id: req.params.id }
-    console.log(req.params.id);
+    // console.log(req.params.id);
 
     Task.findOne(query).exec().then(found_task => {
         if (found_task < 1) {
@@ -227,7 +229,7 @@ export const taskCountToday = async (req, res) => {
 export const taskCountTodayByEmp = async (req, res) => {
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    console.log(req.query.id);
+    // console.log(req.query.id);
 
 
     let getemp = {
@@ -279,7 +281,7 @@ export const targetCountToday = async (req, res) => {
 export const targetCountTodayByEmp = async (req, res) => {
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    console.log("id", req.query.id);
+    // console.log("id", req.query.id);
 
     console.log(startOfToday);
 
@@ -288,7 +290,7 @@ export const targetCountTodayByEmp = async (req, res) => {
         { $group: { _id: req.body.id, totarget: { $sum: "$target" }, totcompleted: { $sum: "$completed" } } }
     ])
     query.then((data) => {
-        console.log(data);
+        // console.log(data);
 
         if (data.length < 1) {
             return res.status(402).json({

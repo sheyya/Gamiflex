@@ -20,11 +20,11 @@ export const employeeLogin = async (req, res) => {
 
     // That means employee is existing and trying to signin fro the right portal
     // Now check for the password
-    console.log(password);
-    console.log(employee.password);
+    // console.log(password);
+    // console.log(employee.password);
 
     let isMatch = await bcrypt.compare(password, employee.password);
-    console.log(isMatch);
+    // console.log(isMatch);
     if (isMatch) {
         // Sign in the token and issue it to the employee
         let token = jwt.sign(
