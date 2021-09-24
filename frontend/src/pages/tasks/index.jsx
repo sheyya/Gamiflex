@@ -445,7 +445,7 @@ export const Tasks = (props) => {
                         visible={modal_addTask}
                         onOk={() => {
 
-                            Task.createTasks({ ...taskState, updated_at: Date.now() }).then((result) => {
+                            Task.createTasks({ ...taskState, updated_at: Date.now(), created_at: Date.now() }).then((result) => {
                                 console.log(taskState.deadline);
                                 toggleTask()
                                 setTaskState({
