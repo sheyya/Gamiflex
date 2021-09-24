@@ -53,8 +53,8 @@ app.use('/datalog', datalog);
 // let anomalyDetectorClient = new AnomalyDetectorClient(endpoint, new AzureKeyCredential(key));
 
 //cron jobs
-cron.schedule('00 55 00 * * *', function () {
-    // console.log("kk");
+cron.schedule('00 37 00 * * *', function () {
+    console.log("kk");
     dailylog()
 }, {
     scheduled: true,
