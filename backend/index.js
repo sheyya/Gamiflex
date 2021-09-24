@@ -61,7 +61,7 @@ const dailycron = new CronJob(
     '00 20 04 * * *', //cron time
     function () {
         console.log("kk");
-        // dailylog()
+        dailylog()
     }, //replace with your function that you want to call
     null, //oncomplete
     false, //start flag
