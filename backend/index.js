@@ -57,63 +57,63 @@ app.use('/datalog', datalog);
 
 //cron jobs
 
-const dailycron = new CronJob(
-    '00 08 51 * * *', //cron time
-    function () {
-        console.log("kk");
-        dailylog()
-    }, //replace with your function that you want to call
-    null, //oncomplete
-    false, //start flag
-    'Asia/Colombo',// timezone
-);
+// const dailycron = new CronJob(
+//     '00 08 51 * * *', //cron time
+//     function () {
+//         console.log("kk");
+//         dailylog()
+//     }, //replace with your function that you want to call
+//     null, //oncomplete
+//     false, //start flag
+//     'Asia/Colombo',// timezone
+// );
 
-const monthlycron = new CronJob(
-    '0 30 23 27 * *', //cron time
-    function () { savesalary() },
-    null, //oncomplete
-    false, //start flag
-    'Asia/Colombo',// timezone
-);
+// const monthlycron = new CronJob(
+//     '0 30 23 27 * *', //cron time
+//     function () { savesalary() },
+//     null, //oncomplete
+//     false, //start flag
+//     'Asia/Colombo',// timezone
+// );
 
-const monthlycronclear = new CronJob(
-    '0 0 0 28 * *', //cron time
-    function () {
-        // console.log("kk");
-        clearmarks()
-    }, //replace with your function that you want to call
-    null, //oncomplete
-    false, //start flag
-    'Asia/Colombo',// timezone
-);
+// const monthlycronclear = new CronJob(
+//     '0 0 0 28 * *', //cron time
+//     function () {
+//         // console.log("kk");
+//         clearmarks()
+//     }, //replace with your function that you want to call
+//     null, //oncomplete
+//     false, //start flag
+//     'Asia/Colombo',// timezone
+// );
 
-dailycron.start()
-monthlycron.start()
-monthlycronclear.start()
+// dailycron.start()
+// monthlycron.start()
+// monthlycronclear.start()
 
-// cron.schedule('00 37 00 * * *', function () {
-//     console.log("kk");
-//     dailylog()
-// }, {
-//     scheduled: true,
-//     timezone: "Asia/Colombo"
-// });
+cron.schedule('00 05 09 * * *', function () {
+    console.log("kk");
+    dailylog()
+}, {
+    scheduled: true,
+    timezone: "Asia/Colombo"
+});
 
-// cron.schedule('0 30 23 27 * *', function () {
-//     // console.log("kk");
-//     savesalary()
-// }, {
-//     scheduled: true,
-//     timezone: "Asia/Colombo"
-// });
+cron.schedule('0 30 23 27 * *', function () {
+    // console.log("kk");
+    savesalary()
+}, {
+    scheduled: true,
+    timezone: "Asia/Colombo"
+});
 
-// cron.schedule('0 0 0 28 * *', function () {
-//     // console.log("kk");
-//     clearmarks()
-// }, {
-//     scheduled: true,
-//     timezone: "Asia/Colombo"
-// });
+cron.schedule('0 0 0 28 * *', function () {
+    // console.log("kk");
+    clearmarks()
+}, {
+    scheduled: true,
+    timezone: "Asia/Colombo"
+});
 
 const savesalary = async () => {
     let marksarr
