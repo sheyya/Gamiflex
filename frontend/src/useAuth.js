@@ -21,9 +21,6 @@ export function AuthProvider({
     const [error, setError] = useState();
     const [loading, setLoading] = useState(false);
     const [loadingInitial, setLoadingInitial] = useState(true);
-    // We are using `react-router` for this example,
-    // but feel free to omit this or use the
-    // router of your choice.
     const history = useHistory();
     const location = useLocation();
 

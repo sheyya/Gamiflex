@@ -280,22 +280,16 @@ const Employee = (props) => {
         }).finally(() => {
             console.log(salaryData);
             tasksData.map((item) => {
+                //get salary for completed tasks in current month
                 if (moment(item.deadline).isBetween(startOfMonth, endOfMonth)) {
                     cs += item.task_type.price * item.completed;
                 } else {
                     console.log(0);
-
                 }
             });
-
+            //add bonus to the current salary
             cs += b;
-            console.log("bonus", b);
-
-            console.log(cs);
-            console.log(salaryData);
-
             setSalaryData({ bonus: b, id: id, salary: (cs) - (cs / 100 * 8), epf: cs / 100 * 20, etf: cs / 100 * 3 })
-            console.log(salaryData);
             message.success({ content: 'Done!', key, duration: 2 })
         })
 

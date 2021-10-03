@@ -41,15 +41,11 @@ export function Linechart({ empid }) {
         console.log("--ss");
         let senddata = []
         let datas = await getnewdata()
-        console.log("data", datas);
-
         setSeries([{ data: datas }])
         if (datas.length > 12) {
             datas.map((d) => {
                 senddata.push({ "timestamp": d.x, "value": d.y })
             })
-            console.log(senddata);
-
             await getanaompoints(senddata)
         }
     }, [])

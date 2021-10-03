@@ -37,25 +37,19 @@ const Employee_Signin = () => {
   //On submit button
   const onLogin = async (e) => {
     e.preventDefault();
-
     //call login controller function
-    var status = await loginUser(Employee,
-      usernameval,
-      passval
-    );
-
+    var status = await loginUser(Employee, usernameval, passval);
     switch (status) {
-
       // password not match
       case 403:
         await setError(
-          "Inavlid Username or Password"
+          "Inavlid Password"
         );
         return -1;
       // user not found
       case 400:
         await setError(
-          "Inavlid Username or Password"
+          "Inavlid Username"
         );
         return -1;
       // network error
@@ -64,11 +58,9 @@ const Employee_Signin = () => {
         return -1;
       case true:
         //success redirect
-        //  history.push('/dashboard/overview') 
         window.location.replace('/dashboard/overview/emp')
         break;
     }
-
   }
 
   return (
