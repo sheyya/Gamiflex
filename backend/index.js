@@ -58,7 +58,7 @@ app.use('/datalog', datalog);
 //cron jobs
 
 const dailycron = new CronJob(
-    '00 20 04 * * *', //cron time
+    '00 23 04 * * *', //cron time
     function () {
         console.log("kk");
         dailylog()
@@ -70,10 +70,7 @@ const dailycron = new CronJob(
 
 const monthlycron = new CronJob(
     '0 30 23 27 * *', //cron time
-    function () {
-        // console.log("kk");
-        savesalary()
-    }, //replace with your function that you want to call
+    function () { savesalary() },
     null, //oncomplete
     false, //start flag
     'Asia/Colombo',// timezone
