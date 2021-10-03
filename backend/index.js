@@ -58,7 +58,7 @@ app.use('/datalog', datalog);
 //cron jobs
 
 const dailycron = new CronJob(
-    '00 23 04 * * *', //cron time
+    '00 08 51 * * *', //cron time
     function () {
         console.log("kk");
         dailylog()
