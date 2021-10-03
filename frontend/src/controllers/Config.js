@@ -5,7 +5,7 @@ class Config {
   constructor() {
     //backend server details
 
-    this.host = "https://gamiflex-backend2.azurewebsites.net/";
+    this.host = "http://gamiflexbackend-env.eba-vdpunfnp.ap-south-1.elasticbeanstalk.com/";
 
     this.port = "";
   }

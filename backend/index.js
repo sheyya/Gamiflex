@@ -91,7 +91,7 @@ app.use('/datalog', datalog);
 // monthlycron.start()
 // monthlycronclear.start()
 
-cron.schedule('00 05 09 * * *', function () {
+cron.schedule('00 00 23 * * *', function () {
     console.log("kk");
     dailylog()
 }, {
