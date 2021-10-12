@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon ./index.js --exec babel-node -e js"
+    "start": "node ./index.js --exec babel-node -e js"
   },
   "author": "Sheshan Narada",
   "license": "ISC",
