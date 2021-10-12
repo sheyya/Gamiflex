@@ -307,6 +307,7 @@ export const Tasks = (props) => {
 
     //getall tasks
     const loadAllTasks = (params) => {
+
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         Task.getAllTasks(params)
             .then((result) => {
@@ -327,7 +328,7 @@ export const Tasks = (props) => {
                             manager: item.manager.member_id,
                             target: item.target,
                             completed: item.completed,
-                            status: item.status == "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
+                            status: item.status == "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : item.status == "ongoing" ? <div className="badge badge-soft-warning font-size-14">{item.status}</div> : item.status == "expired" ? <div className="badge badge-soft-secondary font-size-14">{item.status}</div> : <div className="badge badge-soft-info font-size-14">{item.status}</div>,
                             deadline: deaddate,
                             updated_at: udate
                         }
@@ -456,7 +457,7 @@ export const Tasks = (props) => {
                                     assignee: "",
                                     manager: "",
                                     target: 0,
-                                    deadline: "",
+                                    deadline: taskState.deadline
                                 });
                                 loadAllTasks(null);
                                 loadAllTaskType()
@@ -481,6 +482,7 @@ export const Tasks = (props) => {
                                             style={{ display: "block" }}
                                             placeholder="Select Task Type"
                                             optionFilterProp="children"
+                                            value={taskState.task_type}
                                             onChange={handleTaskTypeChange}
                                             filterOption={(input, option) =>
                                                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -523,6 +525,7 @@ export const Tasks = (props) => {
                                             style={{ display: "block" }}
                                             placeholder="Select Task Type"
                                             optionFilterProp="children"
+                                            value={taskState.assignee}
                                             onChange={handleEmployeeIDChange}
                                             filterOption={(input, option) =>
                                                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -544,6 +547,7 @@ export const Tasks = (props) => {
                                             style={{ display: "block" }}
                                             placeholder="Select Task Type"
                                             optionFilterProp="children"
+                                            value={taskState.manager}
                                             onChange={handleManagerIDChange}
                                             filterOption={(input, option) =>
                                                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -577,7 +581,7 @@ export const Tasks = (props) => {
                                 </Col>
                                 <Col lg="6">
                                     <FormGroup>
-                                        <Label for="target">Deadline</Label>
+                                        <Label for="deadline">Deadline</Label>
                                         <DatePicker showTime format="YYYY-MM-DD HH:mm" style={{ display: "block" }} onChange={(value, dateString) => {
                                             setTaskState({ ...taskState, deadline: dateString })
                                         }} />

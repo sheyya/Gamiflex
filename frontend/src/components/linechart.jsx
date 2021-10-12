@@ -6,10 +6,12 @@ import moment from "moment"
 export function Linechart({ empid }) {
 
     const [anopoints, setAnopoints] = useState([])
+    const [meanpoints, setMeanpoints] = useState([])
     let pdata;
 
     const getnewdata = async () => {
         let newseries = [];
+        let meanseries = [];
         console.log("--ss", empid);
         if (empid) {
             console.log(empid);
@@ -19,7 +21,7 @@ export function Linechart({ empid }) {
                 console.log("------------", temparr);
 
                 temparr.map((log) => {
-                    newseries.push({ x: moment(log.created_at).format("YYYY-MM-DD"), y: log.completedtot })
+                    newseries.push({ x: moment(log.created_at).format("YYYY-MM-DD"), y: log.marks })
                 })
             })
 
@@ -28,24 +30,40 @@ export function Linechart({ empid }) {
             await DataLog.getAllDatalogs().then((result) => {
                 let temparr = result.data;
                 temparr.map((log) => {
+                    let mean = log.completedtot / log.targetot
                     newseries.push({ x: moment(log.created_at).format("YYYY-MM-DD"), y: log.completedtot })
+                    meanseries.push({ x: moment(log.created_at).format("YYYY-MM-DD"), y: mean })
                 })
+
             })
         }
-        console.log("log", newseries);
+        console.log("log", meanseries);
 
-        return newseries
+        return [newseries, meanseries]
     }
 
     useEffect(async () => {
         console.log("--ss");
         let senddata = []
         let datas = await getnewdata()
-        setSeries([{ data: datas }])
-        if (datas.length > 12) {
-            datas.map((d) => {
-                senddata.push({ "timestamp": d.x, "value": d.y })
-            })
+        console.log("---------------", datas);
+
+        setSeries([{ data: datas[0] }])
+        if (datas[0].length >= 12 || datas[1].length >= 12) {
+            //if its employee details page, send marks value to azure
+            if (empid) {
+                datas[0].forEach((d) => {
+                    senddata.push({ "timestamp": d.x, "value": d.y })
+                })
+            }
+            else {
+                //if its dashboard page, send mean value to azure
+                datas[1].forEach((d) => {
+                    senddata.push({ "timestamp": d.x, "value": d.y })
+                })
+            }
+            console.log(senddata);
+
             await getanaompoints(senddata)
         }
     }, [])
@@ -69,7 +87,22 @@ export function Linechart({ empid }) {
                 discrete: anopoints
             },
             xaxis: {
-                type: "datetime"
+                type: "datetime",
+            },
+            yaxis: {
+                title: {
+                    text: empid ? "Marks" : "Finished Pieces",
+                    rotate: -90,
+                    offsetX: 0,
+                    offsetY: 0,
+                    style: {
+                        color: undefined,
+                        fontSize: '12px',
+                        fontFamily: 'Helvetica, Arial, sans-serif',
+                        fontWeight: 600,
+                        cssClass: 'apexcharts-yaxis-title',
+                    },
+                },
             },
             tooltip: {
                 x: {
@@ -84,6 +117,16 @@ export function Linechart({ empid }) {
                     opacityTo: 0.9,
                     stops: [0, 100]
                 }
+            },
+            title: {
+                text: empid ? "Daily Marks" : "Daily Output",
+                align: 'left',
+                style: {
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    fontFamily: "Inter, sans-serif",
+                    color: '#263238'
+                },
             },
         })
     }, [anopoints])

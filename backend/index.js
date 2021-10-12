@@ -29,7 +29,7 @@ import azanomaly from './routes/azanomaly_route.js';
 import datalog from './routes/datalog_routes.js';
 
 const app = express();
-
+app.disable('x-powered-by');
 app.use(bodyParser.json({ limit: '30mb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }))
 app.use(cors());
@@ -50,48 +50,9 @@ app.use('/leavereq', leavereq);
 app.use('/azanomaly', azanomaly);
 app.use('/datalog', datalog);
 
-//azure anomaly detector
-// let key = ANOMALY_DETECTOR_KEY;
-// let endpoint = ANOMALY_DETECTOR_ENDPOINT;
-// let anomalyDetectorClient = new AnomalyDetectorClient(endpoint, new AzureKeyCredential(key));
-
-//cron jobs
-
-// const dailycron = new CronJob(
-//     '00 08 51 * * *', //cron time
-//     function () {
-//         console.log("kk");
-//         dailylog()
-//     }, //replace with your function that you want to call
-//     null, //oncomplete
-//     false, //start flag
-//     'Asia/Colombo',// timezone
-// );
-
-// const monthlycron = new CronJob(
-//     '0 30 23 27 * *', //cron time
-//     function () { savesalary() },
-//     null, //oncomplete
-//     false, //start flag
-//     'Asia/Colombo',// timezone
-// );
-
-// const monthlycronclear = new CronJob(
-//     '0 0 0 28 * *', //cron time
-//     function () {
-//         // console.log("kk");
-//         clearmarks()
-//     }, //replace with your function that you want to call
-//     null, //oncomplete
-//     false, //start flag
-//     'Asia/Colombo',// timezone
-// );
-
-// dailycron.start()
-// monthlycron.start()
-// monthlycronclear.start()
-
-cron.schedule('00 00 23 * * *', function () {
+//Daily cron job to calculate daily marks then update employee total marks and Markslog Document on DB
+//Run at everyday 11.00pm
+cron.schedule('20 30 05 * * *', function () {
     console.log("kk");
     dailylog()
 }, {
@@ -99,26 +60,29 @@ cron.schedule('00 00 23 * * *', function () {
     timezone: "Asia/Colombo"
 });
 
+//Monthly Cron Job to calculate salary with rewards
+//Run at every month 27th at 11.30pm
 cron.schedule('0 30 23 27 * *', function () {
-    // console.log("kk");
     savesalary()
 }, {
     scheduled: true,
     timezone: "Asia/Colombo"
 });
 
+//Monthly Cron Job to clear previous month marks from employees document on DB
+//Run at every month 28th 12.00am
 cron.schedule('0 0 0 28 * *', function () {
-    // console.log("kk");
     clearmarks()
 }, {
     scheduled: true,
     timezone: "Asia/Colombo"
 });
 
+//Function to calculate salary with rewards
 const savesalary = async () => {
     let marksarr
+    //Append marks of all employees to markarr array
     await utils.getEmployees().then((result) => {
-        // console.log(result);
         let rdata = result
         marksarr = rdata.map((item) => {
             return (
@@ -133,8 +97,10 @@ const savesalary = async () => {
         console.log(err);
     })
 
+    //Sort the marks array to descending order
     await marksarr.sort((a, b) => b.marks - a.marks);
-    // console.log(marksarr);
+
+    //Get the highest marks and assign rewards
     marksarr.map((mk, index) => {
         let reward;
         if (index == 0) { reward = 5000 }
@@ -148,14 +114,13 @@ const savesalary = async () => {
         }
         utils.updateEmpSalary(d)
     })
-
 }
 
 const clearmarks = () => {
     utils.getEmployees().then((result) => {
         // console.log(result);
         let rdata = result
-        rdata.map((item) => {
+        rdata.forEach((item) => {
             const newdata = {
                 id: item._id,
                 marks: 0
@@ -174,17 +139,18 @@ const clearmarks = () => {
 
 }
 
+//Function to calculate daily marks then update employee total marks and Markslog Document on DB
 const dailylog = () => {
     utils.createTotTC()
     utils.getEmployees().then((result) => {
         // console.log(result);
         let rdata = result
-        rdata.map((item) => {
+        rdata.forEach((item) => {
             utils.targetCountTodayByEmp(item._id).then(async (result) => {
                 const out = result
-                // console.log(out[0].totarget);
+                console.log(out[0].totarget);
 
-                out.map((data) => {
+                out.forEach((data) => {
                     const attendencemark = 5;
                     const newdata = {
                         id: data._id,

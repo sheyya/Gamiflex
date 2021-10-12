@@ -35,7 +35,7 @@ import { MainTable } from "../../components/MainTable";
 import { DeleteButton, EditButton, VieweButton } from "../../components/Buttons";
 import { message, Modal as DelModal } from "antd";
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-
+import Mngr from "../../controllers/manager";
 
 export const Managers = (props) => {
     const [activeTabProgress, setActiveTabProgress] = useState(1);
@@ -65,6 +65,10 @@ export const Managers = (props) => {
                 }
                 if (tab === 2) {
                     setProgressValue(50);
+                    setUserState({
+                        ...userState,
+                        member_id: `MNGR${('00000' + (mngrCount + 1)).slice(-5)}`
+                    })
                 }
                 if (tab === 3) {
                     setProgressValue(75);
@@ -76,6 +80,9 @@ export const Managers = (props) => {
         }
     };
     const toggle = () => setModal_static(!modal_static);
+
+    //total manager count
+    const [mngrCount, setmngrCount] = useState(0)
 
 
     //get user input data
@@ -150,9 +157,25 @@ export const Managers = (props) => {
             showDeleteConfirm(userid);
         } else {
             loadAllManagers(null)
+            getmngrcount()
         }
 
     }, [location]);
+
+    //get manager count
+    const getmngrcount = () => {
+        let out;
+        const ss = Mngr.mngrCount()
+            .then((result) => {
+                out = result.count
+                setmngrCount(out)
+            })
+            .catch((err) => {
+                console.log(err);
+                out = 0;
+            });
+    };
+
 
     //delete confirmation
 
@@ -454,7 +477,7 @@ export const Managers = (props) => {
                                                                 type="text"
                                                                 className="form-control"
                                                                 // defaultValue={`${userState.firstName} ${userState.lastName}`}
-                                                                value={userState.member_id}
+                                                                defaultValue={`MNG${('00000' + (mngrCount + 1)).slice(-5)}`}
                                                                 onChange={handleChange}
                                                                 validate={{ required: { value: true, errorMessage: 'Please enter an ID' } }}
                                                                 id="managerid"
@@ -489,7 +512,7 @@ export const Managers = (props) => {
                                                             <Input
                                                                 type="text"
                                                                 className="form-control"
-                                                                defaultValue={userState.username}
+                                                                defaultValue={`-MNG${('00000' + (mngrCount + 1)).slice(-5)}`}
                                                                 onChange={handleChange}
                                                                 id="username"
                                                                 name="username"
@@ -707,6 +730,7 @@ export const Managers = (props) => {
                                                     .then((result) => {
                                                         setIsAlertOpen(true);
                                                         loadAllManagers(null);
+                                                        getmngrcount();
                                                         setTimeout(() => {
                                                             setActiveTabProgress(1);
                                                             setProgressValue(25);
@@ -731,6 +755,7 @@ export const Managers = (props) => {
                                                         }, 2000);
                                                     })
                                                     .catch(err => {
+                                                        console.log(err);
 
                                                     })
 

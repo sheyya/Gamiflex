@@ -89,7 +89,7 @@ const Admin_Signin = () => {
                                 <h4 className="font-size-18 mt-2 badge text-dark bg-gami">Admin Login</h4>
                               </div>
 
-                              {error && error ? <Alert color="danger">{error}</Alert> : null}
+                              {error ? <Alert color="danger">{error}</Alert> : null}
 
 
 

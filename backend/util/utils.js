@@ -29,16 +29,16 @@ export const targetCountTodayByEmp = async (data) => {
     let retdata;
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // var startOfToday = new Date(2021, 8, 15);
+    // var endOfToday = new Date(2021, 8, 16);
 
-
-    // console.log(startOfToday);
 
     var query = Task.aggregate([
         { $match: { created_at: { $gte: startOfToday }, assignee: mongoose.Types.ObjectId(data) } },
         { $group: { _id: data, totarget: { $sum: "$target" }, totcompleted: { $sum: "$completed" } } }
     ])
     await query.then((data) => {
-        // console.log(data);
+        console.log(data);
         if (data.length < 1) {
             console.log("no data found");
 
@@ -155,8 +155,6 @@ export const updateEmpSalary = async (data) => {
 
                 }
             });
-
-
         }
 
     }).catch((err) => {
@@ -177,8 +175,6 @@ export const updateEmpSalary = async (data) => {
 
     EmpSalary.find().populate(query).exec().then(found_empsalary => {
         // console.log(found_empsalary);
-
-
         if (found_empsalary < 1) {
             console.log("No empsalary data found");
 
@@ -272,6 +268,9 @@ export const createTotTC = async (data) => {
 
         var now = new Date();
         var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        // var startOfToday = new Date(2021, 8, 15);
+        // var endOfToday = new Date(2021, 8, 16);
+        console.log(startOfToday);
         var query = Task.aggregate([
             { $match: { created_at: { $gte: startOfToday } } },
             { $group: { _id: null, targetot: { $sum: "$target" }, completedtot: { $sum: "$completed" } } }
@@ -281,7 +280,7 @@ export const createTotTC = async (data) => {
             // console.log("--data", data);
 
             if (data.length < 1) {
-                console.log(" No taskType data found");
+                console.log(" No task data found");
 
             } else {
                 totdata = data;

@@ -2,7 +2,7 @@ import totalTC from '../models/totaltc_model.js';
 import markslog from '../models/markslog.js';
 
 
-//get all totalTC
+//get all total Tasks Completed
 export const getAllTotalTC = function (req, res, next) {
     totalTC.find({}).exec().then((log) => {
         if (log.length < 1) {

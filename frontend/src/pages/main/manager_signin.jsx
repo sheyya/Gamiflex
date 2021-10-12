@@ -93,7 +93,7 @@ const Manager_Signin = () => {
                                 <h4 className="font-size-18 mt-2 badge text-dark bg-gami">Manager Login</h4>
                               </div>
 
-                              {error && error ? <Alert color="danger">{error}</Alert> : null}
+                              {error ? <Alert color="danger">{error}</Alert> : null}
 
 
 

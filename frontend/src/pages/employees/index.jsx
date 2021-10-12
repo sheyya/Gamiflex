@@ -31,6 +31,7 @@ import moment from "moment"
 import { Link, RouteComponentProps, useLocation } from "react-router-dom";
 import classnames from "classnames";
 import Admin from "../../controllers/admin";
+import Emp from "../../controllers/employee";
 import { MainTable } from "../../components/MainTable";
 import { DeleteButton, EditButton, VieweButton } from "../../components/Buttons";
 import { message, Modal as DelModal } from "antd";
@@ -65,6 +66,10 @@ export const Employees = (props) => {
                 }
                 if (tab === 2) {
                     setProgressValue(50);
+                    setUserState({
+                        ...userState,
+                        member_id: `EMP${('00000' + (empCount + 1)).slice(-5)}`
+                    })
                 }
                 if (tab === 3) {
                     setProgressValue(75);
@@ -77,6 +82,8 @@ export const Employees = (props) => {
     };
     const toggle = () => setModal_static(!modal_static);
 
+    //total emp count
+    const [empCount, setEmpCount] = useState(0)
 
     //get user input data
     const [userState, setUserState] = useState({
@@ -111,6 +118,8 @@ export const Employees = (props) => {
         });
 
     }
+
+
 
     //validate form wizard data
     const validateformval = (tabval) => {
@@ -150,12 +159,28 @@ export const Employees = (props) => {
             showDeleteConfirm(userid);
         } else {
             loadAllEmployees(null)
+            getempcount();
         }
 
     }, [location]);
 
-    //delete confirmation
 
+    //get employee count
+    const getempcount = () => {
+        let out;
+        const ss = Emp.empCount()
+            .then((result) => {
+                out = result.count
+                setEmpCount(out)
+            })
+            .catch((err) => {
+                console.log(err);
+                out = 0;
+            });
+    };
+
+
+    //delete confirmation
     const { confirm } = DelModal;
     function showDeleteConfirm(data) {
 
@@ -452,7 +477,7 @@ export const Employees = (props) => {
                                                                 type="text"
                                                                 className="form-control"
                                                                 // defaultValue={`${userState.firstName} ${userState.lastName}`}
-                                                                value={userState.member_id}
+                                                                defaultValue={`EMP${('00000' + (empCount + 1)).slice(-5)}`}
                                                                 onChange={handleChange}
                                                                 validate={{ required: { value: true, errorMessage: 'Please enter an ID' } }}
                                                                 id="employeeid"
@@ -487,7 +512,7 @@ export const Employees = (props) => {
                                                             <Input
                                                                 type="text"
                                                                 className="form-control"
-                                                                defaultValue={userState.username}
+                                                                defaultValue={`-EMP${('00000' + (empCount + 1)).slice(-5)}`}
                                                                 // defaultValue={`${userState.fname}${userState.member_id}`}
                                                                 onChange={handleChange}
                                                                 id="username"
@@ -706,6 +731,7 @@ export const Employees = (props) => {
                                                         Admin.createEmpSalary({ employee_id: result.data, month: moment().format('MMM YY') })
                                                         setIsAlertOpen(true);
                                                         loadAllEmployees(null);
+                                                        getempcount();
                                                         setTimeout(() => {
                                                             setActiveTabProgress(1);
                                                             setProgressValue(25);
@@ -730,7 +756,7 @@ export const Employees = (props) => {
                                                         }, 2000);
                                                     })
                                                     .catch(err => {
-
+                                                        console.log(err);
                                                     })
 
 

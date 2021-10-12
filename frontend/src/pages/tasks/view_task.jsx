@@ -256,6 +256,7 @@ const Task = (props) => {
         ) {
             console.log(taskdata);
             if (taskdata.target == taskdata.completed) { taskdata.status = "completed" }
+            if (taskdata.target < taskdata.completed) { taskdata.status = "over target" }
             Tasks.updateTasks(taskdata).then((response) => {
                 console.log(response);
                 message.success({ content: 'Data Updated Successfully', key, duration: 2 }).then(() => {
@@ -292,7 +293,6 @@ const Task = (props) => {
                                     <InputNumber
                                         onChange={role == "employee" ? handleChangeCompletedbyEmp : handleChangeCompleted}
                                         name={role == "employee" ? "completedbyEmp" : "completed"}
-                                        max={taskdata.target}
                                         className="form-control w-100"
                                         defaultValue={taskdata.completed}
                                         value={role == "employee" ? taskdata.completedbyEmp : taskdata.completed}
@@ -439,12 +439,7 @@ const Task = (props) => {
                                                     <Col lg="1">
                                                         <FormGroup>
                                                             <Label for="task-phone">Assignee</Label>
-                                                            {enableEdit ? (
-                                                                <p>{taskdata.assignee_name}</p>
-
-                                                            ) : (
-                                                                    <p>{taskdata.assignee_name}</p>
-                                                                )}
+                                                            <p>{taskdata.assignee_name}</p>
                                                         </FormGroup>
                                                     </Col>
                                                     <Col lg="1">

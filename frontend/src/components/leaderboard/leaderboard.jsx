@@ -257,7 +257,7 @@ export const Leaderbord = () => {
                                                     <div className="c-media">
                                                         <div className="c-media__content">
                                                             <div className="c-media__title">{userd.name}</div>
-                                                            <a className="c-media__link u-text--small" href={role == "admin" ? `/dashboard/employee/view/${userd.id}` : ""} >{userd.member_id}</a>
+                                                            <a className="c-media__link u-text--small" href={role == "admin" || "manager" ? `/dashboard/employee/view/${userd.id}` : ""} >{userd.member_id}</a>
                                                         </div>
                                                     </div>
                                                     <div className={newclassmarks}>
