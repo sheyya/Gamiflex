@@ -14,12 +14,9 @@ const userAuth = passport.authenticate("jwt", { session: false });
 const checkRole = roles => (req, res, next) => {
     if (!roles.includes(req.user.role)) {
         res.status(401).json("Unauthorized");
-        // console.log("Unauthorised");
         return;
     } else next();
 }
-
-
 
 //===========tasks===========
 router.get('/lreq', userAuth, leaveReqController.getLeaveReqs);
@@ -28,7 +25,5 @@ router.get('/lreqbyemp', userAuth, leaveReqController.getLeaveReqsByEmp);
 router.get('/lreq/:id', userAuth, leaveReqController.getLeaveReqByid);
 router.patch('/lreq/:id', userAuth, checkRole(["admin", "manager"]), leaveReqController.updateLeaveReq);
 router.delete('/lreq/:id', userAuth, leaveReqController.deleteLeaveReq);
-
-
 
 export default router;

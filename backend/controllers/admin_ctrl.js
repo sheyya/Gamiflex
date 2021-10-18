@@ -5,7 +5,8 @@ import Admin from '../models/admin_model.js';
 import Employee from '../models/employee_model.js';
 import Manager from '../models/manager_model.js';
 import { SECRET } from '../config/index.js'
-
+import { global_search } from '../config/global_search.js'
+import { getPagination, getPagingData } from '../config/pagination.formatter.js'
 
 //----- ADMINS -----//
 
@@ -78,13 +79,8 @@ export const adminLogin = async (req, res) => {
 
     // That means admin is existing and trying to signin fro the right portal
     // Now check for the password
-    // console.log(password);
-    // console.log(admin.password);
     let isMatch = await bcrypt.compare(password, admin.password);
-    // console.log(isMatch);
     if (isMatch) {
-        // console.log(admin.member_id);
-
         // Sign in the token and issue it to the admin
         let token = jwt.sign(
             {
@@ -129,7 +125,6 @@ export const createEmployee = async (req, res) => {
         const empDetails = req.body;
         // Validate the username
         let usernameNotTaken = await validateUsername(empDetails.username, Employee);
-        // console.log(usernameNotTaken);
         if (!usernameNotTaken) {
             res.status(400).json({
                 message: `Username is already taken.`,
@@ -147,7 +142,6 @@ export const createEmployee = async (req, res) => {
             });
             return;
         }
-        // console.log(empDetails);
 
         // Get the hashed password
         const password = await bcrypt.hash(empDetails.pass, 12);
@@ -184,8 +178,20 @@ export const createEmployee = async (req, res) => {
 };
 
 //get all employees
-export const getEmployees = function (req, res, next) {
-    Employee.find({}).exec().then((user) => {
+export const getEmployees = async function (req, res, next) {
+
+    const { page, size, search } = req.query;
+    const { limit, offset } = getPagination(page, size);
+
+
+    //global search
+    let columns = ["fname", "lname", "department", "member_id", "contact_num"]
+    let where = search ? global_search(columns, search) : {};
+    let pageCount = await Employee.find(where);
+    let all_data = Employee.find(where).sort({ created_at: -1 }).skip(offset).limit(limit);
+
+
+    all_data.exec().then((user) => {
         if (user.length < 1) {
             return res.status(402).json({
                 message: "No employees data availble",
@@ -194,7 +200,7 @@ export const getEmployees = function (req, res, next) {
             return res.status(200).json({
                 success: true,
                 code: 200,
-                data: user,
+                ...getPagingData(user, page, limit, pageCount.length),
             });
         }
     })
@@ -210,7 +216,6 @@ export const getEmployees = function (req, res, next) {
 export const updateEmployee = async (req, res, next) => {
     let pass;
     let query = { _id: req.params.id }
-    // console.log(req.body.pass);
 
     if (req.body.username) {
         pass = await bcrypt.hash(req.body.pass, 12);
@@ -376,8 +381,18 @@ export const createManager = async (req, res) => {
 };
 
 //get all managers
-export const getManagers = function (req, res, next) {
-    Manager.find({}).then((user) => {
+export const getManagers = async function (req, res, next) {
+    const { page, size, search } = req.query;
+    const { limit, offset } = getPagination(page, size);
+
+
+    //global search
+    let columns = ["fname", "lname", "department", "member_id", "contact_num"]
+    let where = search ? global_search(columns, search) : {};
+    let pageCount = await Manager.find(where);
+    let all_data = Manager.find(where).sort({ created_at: -1 }).skip(offset).limit(limit);
+
+    all_data.exec().then((user) => {
         if (user.length < 1) {
             return res.status(402).json({
                 message: " No manager data found",
@@ -386,7 +401,7 @@ export const getManagers = function (req, res, next) {
             return res.status(200).json({
                 success: true,
                 code: 200,
-                managers: user,
+                ...getPagingData(user, page, limit, pageCount.length),
             });
         }
     })
@@ -403,7 +418,7 @@ export const updateManager = async (req, res, next) => {
     let pass;
     let query = { _id: req.params.id }
     if (req.body.username) {
-        pass = await bcrypt.hash(req.body.password, 12);
+        pass = await bcrypt.hash(req.body.pass, 12);
     }
     Manager.findOne(query).exec().then(found_manager => {
         if (found_manager < 1) {

@@ -17,11 +17,11 @@ export const managerLogin = async (req, res) => {
             success: false
         });
     }
-    // console.log(password);
 
     // That means manager is existing and trying to signin fro the right portal
     // Now check for the password
     let isMatch = await bcrypt.compare(password, manager.password);
+
     if (isMatch) {
         // Sign in the token and issue it to the manager
         let token = jwt.sign(

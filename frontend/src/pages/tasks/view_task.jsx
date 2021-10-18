@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, RouteComponentProps, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import moment from "moment"
 import "./users.scss";
 import {
@@ -12,17 +12,7 @@ import {
     Container,
     Button,
     Input,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownToggle,
-    Modal,
-    ModalBody,
-    ModalHeader,
-    Table,
-    UncontrolledTooltip,
 } from "reactstrap";
-import logodark from "../../assets/images/logo-dark.png";
 import Tasks from "../../controllers/task";
 import Admin from "../../controllers/admin";
 import { message, Select, DatePicker, InputNumber } from "antd";
@@ -30,14 +20,7 @@ import useAuth from "../../useAuth";
 import jwt from 'jwt-decode'
 
 const Task = (props) => {
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [dropdownOpenGroup, setDropdownOpenGroup] = useState(false);
-    const [dropdownOpenWallet, setDropdownOpenWallet] = useState(false);
-    const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
-    const toggleDropdownGroup = () => setDropdownOpenGroup((prevState) => !prevState);
-    const toggleDropdownWallet = () => setDropdownOpenWallet((prevState) => !prevState);
     const location = useLocation();
-    let data = [];
     const { user } = useAuth();
     const userdatatk = localStorage.getItem('usertoken');
     let role = user.role || jwt(userdatatk).role;
@@ -58,18 +41,14 @@ const Task = (props) => {
         deadline: ""
     });
     const [enableEdit, setEnableEdit] = useState(false);
-    // const [isAlertOpen, setIsAlertOpen] = useState(false);
 
+    //set task type data
     const [getDataT, setGetDataT] = useState([{
         value: "",
         name: "",
     }])
 
-    const [getDataE, setGetDataE] = useState([{
-        empIDs: "",
-        empid: "",
-    }])
-
+    //set task manager data
     const [getDataM, setGetDataM] = useState([{
         mngrIDs: "",
         mngrid: ""
@@ -83,81 +62,56 @@ const Task = (props) => {
             ...taskdata,
             [e.target.name]: value,
         });
-        console.log(taskdata);
-
     };
 
     // handle department change
     const handleDepartmentChange = (value) => {
-        console.log(value);
-
         setTaskData(
             {
                 ...taskdata, department: value
             }
         )
-        console.log(taskdata.department);
-
     }
 
     //handle manager
     const handleManagerIDChange = (value) => {
-        console.log(value);
-
         setTaskData(
             {
                 ...taskdata, manager: value
             }
         )
-        console.log(taskdata.manager);
-
     }
 
     // handle task type
     const handleTaskTypeChange = (value) => {
-        console.log(value);
-
         setTaskData(
             {
                 ...taskdata, task_name: value
             }
         )
-        console.log(taskdata.task_name);
-
     }
 
     // handle task completd
     const handleChangeCompleted = (value) => {
-        console.log(value);
-
         setTaskData(
             {
                 ...taskdata, completed: value
             }
         )
-        console.log(taskdata.completed);
-
     }
 
     // handle task completd by emp
     const handleChangeCompletedbyEmp = (value) => {
-        console.log(value);
-
         setTaskData(
             {
                 ...taskdata, completedbyEmp: value
             }
         )
-        console.log(taskdata.completedbyEmp);
-
     }
 
     useEffect(() => {
-        // const taskid = location.state.id;
-        // const isEdit = location.state.edit;
         let urldata = window.location.pathname.split("/");
         let taskid = urldata[urldata.length - 1];
-        console.log(urldata[urldata.length - 2]);
 
         loadTask(taskid)
         loadAllTaskType();
@@ -177,7 +131,6 @@ const Task = (props) => {
         await Tasks.getAllTaskTypes()
             .then((result) => {
                 const data = result.taskTypes;
-                console.log(data);
                 setGetDataT(data.map((item) => {
                     return (
                         {
@@ -186,12 +139,7 @@ const Task = (props) => {
                         }
                     )
                 }))
-                // setLoading(false)
-            })
-            .catch((err) => {
-            })
-
-
+            }).catch((err) => { console.log(err); })
 
         await Admin.getAllManagers().then((result) => {
             const data = result.managers;
@@ -204,16 +152,12 @@ const Task = (props) => {
                 )
             }))
             // setLoading(false)
-        })
-            .catch((err) => {
-            })
-
+        }).catch((err) => { console.log(err); })
     }
 
 
     const loadTask = (params) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
-
         Tasks.getTaskByID(params)
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
@@ -236,14 +180,10 @@ const Task = (props) => {
                     }
 
                 );
-            })
-            .catch((err) => {
-                console.log(err);
-
-            })
+            }).catch((err) => { console.log(err); })
     };
 
-
+    // Function to update task details
     const updateTask = async () => {
         message.loading({ content: 'Updating Task...', key, duration: 0 })
         if (
@@ -254,24 +194,18 @@ const Task = (props) => {
             taskdata.deadline.trim().length > 0 &&
             taskdata.target.valueOf() > 0
         ) {
-            console.log(taskdata);
-            if (taskdata.target == taskdata.completed) { taskdata.status = "completed" }
+            if (taskdata.target === taskdata.completed) { taskdata.status = "completed" }
             if (taskdata.target < taskdata.completed) { taskdata.status = "over target" }
             Tasks.updateTasks(taskdata).then((response) => {
-                console.log(response);
                 message.success({ content: 'Data Updated Successfully', key, duration: 2 }).then(() => {
                     props.history.push('/dashboard/tasks/')
                 })
-            }).catch(err => {
-                console.log(err);
-            })
+            }).catch((err) => { console.log(err); })
         } else {
-            console.log(taskdata);
             message.error({ content: "Please fill all fields", key, duration: 2 });
             console.log("Error");
         }
     };
-
 
 
     return (
@@ -279,7 +213,6 @@ const Task = (props) => {
             <div className="page-content">
                 <Container fluid={true}>
                     <Row>
-
                         <Row>
                             <div className="page-title-box">
                                 <h4 className="mb-0">
@@ -291,11 +224,11 @@ const Task = (props) => {
                             <Col lg="1">
                                 <FormGroup className="w-100">
                                     <InputNumber
-                                        onChange={role == "employee" ? handleChangeCompletedbyEmp : handleChangeCompleted}
-                                        name={role == "employee" ? "completedbyEmp" : "completed"}
+                                        onChange={role === "employee" ? handleChangeCompletedbyEmp : handleChangeCompleted}
+                                        name={role === "employee" ? "completedbyEmp" : "completed"}
                                         className="form-control w-100"
                                         defaultValue={taskdata.completed}
-                                        value={role == "employee" ? taskdata.completedbyEmp : taskdata.completed}
+                                        value={role === "employee" ? taskdata.completedbyEmp : taskdata.completed}
                                         id="task-address"
                                     />
                                 </FormGroup>
@@ -315,7 +248,7 @@ const Task = (props) => {
                                 <h4 className="mb-0">
                                     {enableEdit ? "Edit Task Details" : "Task Details"}
                                 </h4>
-                            </div>{role == "manager" || role == "admin" ?
+                            </div>{role === "manager" || role === "admin" ?
                                 <div className="d-inline-flex">
                                     <Col lg="3">
                                         <Button

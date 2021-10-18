@@ -8,7 +8,6 @@ import {
     CardBody,
     Container,
     Button,
-    UncontrolledTooltip,
     Form,
     FormGroup,
     Input,
@@ -28,7 +27,7 @@ import {
 } from "reactstrap";
 import "./users.scss";
 import moment from "moment"
-import { Link, RouteComponentProps, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import classnames from "classnames";
 import Admin from "../../controllers/admin";
 import Emp from "../../controllers/employee";
@@ -52,8 +51,7 @@ export const Employees = (props) => {
     const [isvalid, setisvalid] = useState(false);
     const [data, setData] = useState([]);
     const [meta, setMeta] = useState({});
-
-
+    const location = useLocation();
 
     //increment wizard page
     const toggleTabProgress = (tab) => {
@@ -80,6 +78,7 @@ export const Employees = (props) => {
             }
         }
     };
+    //toggle registration model
     const toggle = () => setModal_static(!modal_static);
 
     //total emp count
@@ -104,22 +103,16 @@ export const Employees = (props) => {
         nominee: "",
         member_id: "",
         role: "employee"
-
     })
 
     //handle input changes
     const handleChange = (e) => {
         const value = e.target.value;
-        console.log(value);
-
         setUserState({
             ...userState,
             [e.target.name]: value
         });
-
     }
-
-
 
     //validate form wizard data
     const validateformval = (tabval) => {
@@ -135,7 +128,6 @@ export const Employees = (props) => {
                         setisvalid(true)
                         toggleTabProgress(activeTabProgress + 1);
                     }
-
                 }
                 else { setisvalid(false) }
                 break;
@@ -146,29 +138,24 @@ export const Employees = (props) => {
         }
     }
 
-    const location = useLocation();
-
     useEffect(() => {
-        console.log("hi");
-
         let urldata = window.location.pathname.split("/");
         let userid = urldata[urldata.length - 1];
-        console.log(urldata[urldata.length - 2]);
 
+        // Detect if delete button clicked
         if (urldata[urldata.length - 2] === "delete") {
             showDeleteConfirm(userid);
         } else {
             loadAllEmployees(null)
             getempcount();
         }
-
     }, [location]);
 
 
     //get employee count
     const getempcount = () => {
         let out;
-        const ss = Emp.empCount()
+        Emp.empCount()
             .then((result) => {
                 out = result.count
                 setEmpCount(out)
@@ -183,7 +170,6 @@ export const Employees = (props) => {
     //delete confirmation
     const { confirm } = DelModal;
     function showDeleteConfirm(data) {
-
         confirm({
             title: 'Are you sure delete this?',
             icon: <ExclamationCircleOutlined />,
@@ -199,9 +185,11 @@ export const Employees = (props) => {
             },
         });
     }
+
     // loading message key
     const key = 'loading';
 
+    // Employee delete function
     const deleteEmployees = (params) => {
         message.loading({ content: 'Deleting...', key, duration: 0 })
         Admin.deleteEmployee(params)
@@ -209,25 +197,22 @@ export const Employees = (props) => {
                 message.success({ content: 'Deleted!', key, duration: 1 }).then(() => {
                     props.history.push('/dashboard/employees')
                 })
-
             })
             .catch((err) => {
                 message.error({ content: 'Error Occured!', key, duration: 2 });
             })
     };
 
-
     //getall employees
     const loadAllEmployees = (params) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         Admin.getAllEmployees(params)
             .then((result) => {
+                setMeta(result.meta);
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
                 setData(rdata.map((item) => {
                     const date = moment(item.created_at).format('YYYY MMMM DD')
-                    console.log(date);
-
                     return (
                         {
                             id: item._id,
@@ -239,14 +224,11 @@ export const Employees = (props) => {
                         }
                     )
                 }))
-
-
             })
             .catch((err) => {
                 message.warning({ content: 'No Data Found!', key, duration: 2 });
             })
     }
-
 
     return (
         <React.Fragment>
@@ -255,7 +237,6 @@ export const Employees = (props) => {
                     <div className="page-title-box">
                         <h4 className="mb-0">Employees</h4>
                     </div>
-
                     <Row>
                         <Col xs={12}>
                             <Button
@@ -314,7 +295,7 @@ export const Employees = (props) => {
                                     setIsAlertOpen(false);
                                 }}
                             >
-                                Data Added Successfully...!
+                                Employee Added Successfully...!
                             </Alert>
                             <div id="progrss-wizard" className="twitter-bs-wizard">
                                 <ul className="twitter-bs-wizard-nav nav-justified nav nav-pills">
@@ -323,9 +304,6 @@ export const Employees = (props) => {
                                             className={classnames({
                                                 active: activeTabProgress === 1,
                                             })}
-                                            onClick={() => {
-                                                // toggleTabProgress(1);
-                                            }}
                                         >
                                             <span className="step-number">01</span>
                                             <span className="step-title">Contact Details</span>
@@ -336,9 +314,6 @@ export const Employees = (props) => {
                                             className={classnames({
                                                 active: activeTabProgress === 2,
                                             })}
-                                            onClick={() => {
-                                                // toggleTabProgress(2);
-                                            }}
                                         >
                                             <span className="step-number">02</span>
                                             <span className="step-title">Work Details</span>
@@ -349,9 +324,6 @@ export const Employees = (props) => {
                                             className={classnames({
                                                 active: activeTabProgress === 3,
                                             })}
-                                            onClick={() => {
-                                                // toggleTabProgress(3);
-                                            }}
                                         >
                                             <span className="step-number">03</span>
                                             <span className="step-title">Personal Details</span>
@@ -362,16 +334,12 @@ export const Employees = (props) => {
                                             className={classnames({
                                                 active: activeTabProgress === 4,
                                             })}
-                                            onClick={() => {
-                                                // toggleTabProgress(4);
-                                            }}
                                         >
                                             <span className="step-number">04</span>
                                             <span className="step-title">Confirm Detail</span>
                                         </NavLink>
                                     </NavItem>
                                 </ul>
-
                                 <div id="bar" className="mt-4">
                                     <Progress
                                         color="success"
@@ -476,7 +444,6 @@ export const Employees = (props) => {
                                                             <Input
                                                                 type="text"
                                                                 className="form-control"
-                                                                // defaultValue={`${userState.firstName} ${userState.lastName}`}
                                                                 defaultValue={`EMP${('00000' + (empCount + 1)).slice(-5)}`}
                                                                 onChange={handleChange}
                                                                 validate={{ required: { value: true, errorMessage: 'Please enter an ID' } }}
@@ -564,9 +531,7 @@ export const Employees = (props) => {
                                                                     }
                                                                 }}
                                                             />
-
                                                         </Col>
-
                                                     </Row>
                                                 </AvForm>
                                             </Form>
@@ -608,7 +573,6 @@ export const Employees = (props) => {
                                                         <Row>
                                                             <Col lg="6">
                                                                 <FormGroup>
-
                                                                     <Label for="marital_status">Marital Status</Label>
                                                                     <Dropdown
                                                                         isOpen={dropdownOpenWallet}
@@ -627,9 +591,7 @@ export const Employees = (props) => {
                                                             </Col>
                                                             <Col lg="6">
                                                                 <FormGroup>
-
                                                                     <Label for="gender"> Gender</Label>
-
                                                                     <Dropdown
                                                                         isOpen={dropdownOpenGroup}
                                                                         id="gender"
@@ -646,7 +608,6 @@ export const Employees = (props) => {
                                                                 </FormGroup>
                                                             </Col>
                                                         </Row>
-
                                                     </Col>
                                                 </Row>
                                             </Form>
@@ -671,25 +632,7 @@ export const Employees = (props) => {
                                                     <Row><Label className="d-inline-flex mb-2 "> Nominee : <p className="mx-2 mb-0 fw-light">{userState.nominee}</p></Label></Row>
                                                     <Row><Label className="d-inline-flex mb-2 "> Marital Status : <p className="mx-2 mb-0 fw-light">{userState.marital_status}</p></Label></Row>
                                                 </Col>
-                                                {/* <Col lg="4">
-                                                   
-                                                </Col> */}
                                             </Row>
-                                            {/* <Row className="mt-4">
-                                                <Col lg="12">
-                                                    <div className="text-center mx-auto" style={{ alignItems: "center", justifyContent: "center" }}>
-                                                        <div className="mb-4" >
-
-                                                            <div >
-
-                                                                <h5 ><i className="mdi mdi-check-circle-outline text-success display-6 px-2"></i> Confirm Detail</h5>
-                                                                 <p className="text-muted">If several languages coalesce, the grammar of the resulting</p> 
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </Col>
-                                            </Row> */}
                                         </div>
                                     </TabPane>
                                 </TabContent>

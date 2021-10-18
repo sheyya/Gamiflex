@@ -3,52 +3,59 @@ import ReactApexChart from 'react-apexcharts'
 import AzAnomaly from "../controllers/azanomaly";
 import DataLog from "../controllers/datalog";
 import moment from "moment"
-export function Linechart({ empid }) {
 
+export function Linechart({ empid }) {
+    //state variable to store anomalize points
     const [anopoints, setAnopoints] = useState([])
-    const [meanpoints, setMeanpoints] = useState([])
+    //temp variable to store anomalize points
     let pdata;
 
+    //Function to get data from employees and factory daily logs
     const getnewdata = async () => {
-        let newseries = [];
-        let meanseries = [];
-        console.log("--ss", empid);
-        if (empid) {
-            console.log(empid);
 
+        //array to store employee marks
+        let newseries = [];
+        //array to store mean value of factory daily output
+        let meanseries = [];
+
+        //function to call if linechart request from employee details page
+        if (empid) {
             await DataLog.getMarksByEmployee({ empid }).then((result) => {
                 let temparr = result.data;
-                console.log("------------", temparr);
-
-                temparr.map((log) => {
+                temparr.forEach((log) => {
                     newseries.push({ x: moment(log.created_at).format("YYYY-MM-DD"), y: log.marks })
                 })
             })
-
         }
+        //function to call if linechart request from dashboard page
         else {
+            //function to get data for factory overall performance
             await DataLog.getAllDatalogs().then((result) => {
                 let temparr = result.data;
-                temparr.map((log) => {
+                temparr.forEach((log) => {
+                    //calculate mean value
                     let mean = log.completedtot / log.targetot
+                    //data need to render chart
                     newseries.push({ x: moment(log.created_at).format("YYYY-MM-DD"), y: log.completedtot })
+                    //data need to detect anomaly
                     meanseries.push({ x: moment(log.created_at).format("YYYY-MM-DD"), y: mean })
                 })
-
             })
         }
-        console.log("log", meanseries);
-
         return [newseries, meanseries]
     }
 
     useEffect(async () => {
-        console.log("--ss");
         let senddata = []
-        let datas = await getnewdata()
-        console.log("---------------", datas);
 
+        //get data from getnewdata() function
+        let datas = await getnewdata()
+
+        // getnewdata() return 2 arrays.
+        // Store first array with employee marks
         setSeries([{ data: datas[0] }])
+
+        // If array has more than 12 points call the anomaly detector
         if (datas[0].length >= 12 || datas[1].length >= 12) {
             //if its employee details page, send marks value to azure
             if (empid) {
@@ -62,12 +69,14 @@ export function Linechart({ empid }) {
                     senddata.push({ "timestamp": d.x, "value": d.y })
                 })
             }
-            console.log(senddata);
 
+            // Call anomaly detector function with data
             await getanaompoints(senddata)
         }
     }, [])
 
+    // Function to display anomlize points in red color on chart
+    // Calls only when there is anomalize points available
     useEffect(() => {
         setOptions({
             chart: {
@@ -131,13 +140,13 @@ export function Linechart({ empid }) {
         })
     }, [anopoints])
 
+    // Function to get anomaly points
     const getanaompoints = (senddata) => {
         AzAnomaly.getAnomaly(senddata).then(async (points) => {
             if (points.length < 0) {
                 console.log("no anomaly");
             }
             else {
-                console.log(points);
                 let rdata = points.data;
                 pdata = rdata.map((point) => {
                     return (
@@ -151,29 +160,24 @@ export function Linechart({ empid }) {
                         }
                     )
                 })
-                console.log("get data", pdata);
-
+                // Set found anomaly points to state variable
                 await setAnopoints(prevState => ([...prevState, ...pdata]))
-                console.log("ss", anopoints);
-
             }
         })
     }
 
+    // State variable with table data and options
     const [series, setSeries] = useState(
         [{ name: "Data", data: [] }]
     )
     const [options, setOptions] = useState({})
 
 
-
+    // Return chart using appexcharts library
     return (
-
-
         <div id="chart">
             <ReactApexChart options={options} series={series} type="line" height={350} />
         </div>
-
     );
 
 }

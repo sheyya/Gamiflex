@@ -3,30 +3,17 @@ import {
     Row,
     Col,
     Card,
-    NavLink,
     CardBody,
     Container,
     Button,
-    UncontrolledTooltip,
     Form,
     FormGroup,
-    Label,
-    NavItem,
-    Progress,
-    TabContent,
-    TabPane,
-    Alert,
-    Dropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
+    Label
 } from "reactstrap";
 import "./users.scss";
 import moment from "moment"
-import { Link, RouteComponentProps, useLocation } from "react-router-dom";
-import classnames from "classnames";
+import { useLocation } from "react-router-dom";
 import LeaveReq from "../../controllers/leavereq";
-import Admin from "../../controllers/admin";
 import { MainTable } from "../../components/MainTable";
 import { DeleteButton, EditButton, ApproveButton, RejectButton } from "../../components/Buttons";
 import { message, Modal, Select, DatePicker, Input } from "antd";
@@ -35,11 +22,7 @@ import useAuth from "../../useAuth";
 import jwt from 'jwt-decode'
 
 export const LeaveReqs = (props) => {
-    const [activeTabProgress, setActiveTabProgress] = useState(1);
     const [modal_addLeaveReq, setModal_addLeaveReq] = useState(false);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
-    const [isvalid, setisvalid] = useState(false);
     const [data, setData] = useState([]);
     const [meta, setMeta] = useState({});
     const { user } = useAuth();
@@ -48,11 +31,12 @@ export const LeaveReqs = (props) => {
     const { RangePicker } = DatePicker;
     const { TextArea } = Input;
 
+    // Toggle add new leave request modal
     const toggleLeaveReq = () => setModal_addLeaveReq(!modal_addLeaveReq);
     let userid = jwt(userdatatk).user_id
     let mngr_mid;
 
-    //get leavereq data
+    //state variable to store leavereq data
     const [leavereqState, setLeaveReqState] = useState({
         status: "pending",
         employee_id: "",
@@ -61,12 +45,12 @@ export const LeaveReqs = (props) => {
         dateRange: ""
     })
 
+    // loading message key
+    const key = 'loading';
 
     //handle input changes for leavereqs
     const handleChange = (e) => {
         const value = e.target.value;
-        console.log(value);
-
         setLeaveReqState({
             ...leavereqState,
             [e.target.name]: value
@@ -77,20 +61,20 @@ export const LeaveReqs = (props) => {
     const location = useLocation();
 
     useEffect(() => {
-        console.log("hi");
-
+        // get request id form url
         let urldata = window.location.pathname.split("/");
         let req_id = urldata[urldata.length - 1];
-        console.log(urldata[urldata.length - 2]);
+
         userid = jwt(userdatatk).user_id
-        role == "admin" || role == "manager" ? mngr_mid = jwt(userdatatk).member_id : mngr_mid = "";
-        console.log(mngr_mid);
+        // get current user role and set id if user is admin or manager
+        role === "admin" || role === "manager" ? mngr_mid = jwt(userdatatk).member_id : mngr_mid = "";
+
         setLeaveReqState({
             ...leavereqState,
             employee_id: userid
         })
-        console.log(urldata[urldata.length - 2]);
 
+        // Detect request type from url
         if (urldata[urldata.length - 2] === "reject") {
             showRejectConfirm(req_id);
         }
@@ -101,24 +85,23 @@ export const LeaveReqs = (props) => {
             showDeleteConfirm(req_id);
         }
         else {
-
-            if (role == "admin" || role == "manager") {
+            // Get all request if user is admin or manager
+            if (role === "admin" || role === "manager") {
                 loadAllLeaveReqs(null);
             }
-            if (role == "employee") {
+            // Get only employees request if user is employee
+            if (role === "employee") {
                 loadleavereqbyemp(userid)
             }
         }
-
     }, [location]);
 
     //delete confirmation
-
     const { confirm } = Modal;
     const { Option } = Select;
 
+    //show confirm dialog box
     function showDeleteConfirm(data) {
-
         confirm({
             title: 'Are you sure delete this?',
             icon: <ExclamationCircleOutlined />,
@@ -134,8 +117,8 @@ export const LeaveReqs = (props) => {
         });
     }
 
+    //show confirm dialog box
     function showApproveConfirm(data) {
-
         confirm({
             title: 'Are you sure approve this?',
             icon: <ExclamationCircleOutlined />,
@@ -143,16 +126,16 @@ export const LeaveReqs = (props) => {
             okType: 'success',
             cancelText: 'No',
             onOk() {
-                updateLeaveReq(data, "approved")
+                updateLeaveReq(data, "approved") //Update status as Approved
             },
             onCancel() {
-                props.history.push('/dashboard/leaverequests')
+                props.history.push('/dashboard/leaverequests') //Reload data on table
             },
         });
     }
 
+    //show confirm dialog box
     function showRejectConfirm(data) {
-
         confirm({
             title: 'Are you sure reject this?',
             icon: <ExclamationCircleOutlined />,
@@ -168,19 +151,15 @@ export const LeaveReqs = (props) => {
         });
     }
 
-    //update leave request
+    //update leave request with new status
     const updateLeaveReq = async (id, value) => {
         message.loading({ content: 'Updating Leave Request...', key, duration: 0 })
-
         let newdata = {
             id: id,
             status: value,
             approved_manager: mngr_mid
         }
-        console.log(newdata);
-
         LeaveReq.updateLeaveReqs(newdata).then((response) => {
-            console.log(response);
             message.success({ content: 'Updated Successfully', key, duration: 2 }).then(() => {
                 props.history.push('/dashboard/leaverequests')
             })
@@ -188,8 +167,6 @@ export const LeaveReqs = (props) => {
             console.log(err);
         })
     };
-    // loading message key
-    const key = 'loading';
 
     const deleteLeaveReqs = (params) => {
         message.loading({ content: 'Deleting...', key, duration: 0 })
@@ -215,8 +192,7 @@ export const LeaveReqs = (props) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
                 console.log(rdata);
-
-
+                setMeta(result.meta);
                 setData(rdata.map((item) => {
                     const createdate = moment(item.created_at).format('YY MMM DD - HH:mm')
                     let apprmngr
@@ -235,7 +211,7 @@ export const LeaveReqs = (props) => {
                             approved_manager: apprmngr,
                             reason: item.reason,
                             dateRange: `${item.dateRange[0]} - ${item.dateRange[1]}`,
-                            status: item.status == "approved" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
+                            status: item.status === "approved" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
                             created_at: createdate
                         }
                     )
@@ -279,7 +255,7 @@ export const LeaveReqs = (props) => {
                             approved_manager: apprmngr,
                             reason: item.reason,
                             dateRange: `${item.dateRange[0]} - ${item.dateRange[1]}`,
-                            status: item.status == "approved" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
+                            status: item.status === "approved" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
                             created_at: creatdate
                         }
                     )
@@ -296,7 +272,8 @@ export const LeaveReqs = (props) => {
     let coloumnsdata;
     let buttondata;
 
-    if (role == "admin" || role == "manager") {
+    // Set table columns according to current user role
+    if (role === "admin" || role === "manager") {
         coloumnsdata = [
             { label: "Employee ID", field: "employee_id" },
             { label: "Employee Name", field: "name" },
@@ -333,10 +310,9 @@ export const LeaveReqs = (props) => {
                     <div className="page-title-box">
                         <h4 className="mb-0">Leave Requests</h4>
                     </div>
-
                     <Row>
                         <Col xs={12}>
-                            {role == "employee" ? <Button
+                            {role === "employee" ? <Button
                                 onClick={() => {
                                     setModal_addLeaveReq(true);
                                 }}
@@ -349,6 +325,7 @@ export const LeaveReqs = (props) => {
                             <Card>
                                 <CardBody>
                                     <MainTable
+                                        meta={meta}
                                         data={data}
                                         handlePageChange={loadAllLeaveReqs}
                                         columns={coloumnsdata}
@@ -364,12 +341,7 @@ export const LeaveReqs = (props) => {
                         maskClosable={false}
                         visible={modal_addLeaveReq}
                         onOk={() => {
-                            console.log(userid);
-
-                            console.log(leavereqState.employee_id);
-                            console.log(leavereqState.dateRange);
                             LeaveReq.createLeaveReqs(leavereqState).then((result) => {
-                                console.log(leavereqState);
                                 toggleLeaveReq()
                                 setLeaveReqState({
                                     status: "pending",
@@ -383,7 +355,6 @@ export const LeaveReqs = (props) => {
                             })
                                 .catch(err => {
                                     console.log(err);
-
                                 })
 
                         }}
@@ -407,7 +378,6 @@ export const LeaveReqs = (props) => {
                                         <Label for="reason">Reason</Label>
                                         <TextArea
                                             rows={4}
-                                            // defaultValue={`${userState.firstName} ${userState.lastName}`}
                                             value={leavereqState.reason || ''}
                                             onChange={handleChange}
                                             validate={{ required: { value: true, errorMessage: 'Please enter Reason' } }}
@@ -420,7 +390,6 @@ export const LeaveReqs = (props) => {
                             </Row>
                         </Form>
                     </Modal>
-
                 </Container>
             </div>
         </React.Fragment >

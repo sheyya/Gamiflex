@@ -5,16 +5,17 @@ import moment from "moment"
 import EmpSalary from '../models/empsalary.js';
 import Markslog from '../models/markslog.js';
 import totalTC from '../models/totaltc_model.js';
+import * as azadController from '../controllers/azureanomalydetector.js';
+import * as Data_log from '../controllers/datalog_ctrl.js';
+import * as Mailer from './mailer.js';
 
 //get all employees
 export const getEmployees = async () => {
-
     let data = []
     await Employee.find({}).exec().then((user) => {
         if (user.length < 1) {
             console.log("No user found");
         } else {
-            // console.log(user);
             data = user
         }
     })
@@ -29,9 +30,6 @@ export const targetCountTodayByEmp = async (data) => {
     let retdata;
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    // var startOfToday = new Date(2021, 8, 15);
-    // var endOfToday = new Date(2021, 8, 16);
-
 
     var query = Task.aggregate([
         { $match: { created_at: { $gte: startOfToday }, assignee: mongoose.Types.ObjectId(data) } },
@@ -41,7 +39,6 @@ export const targetCountTodayByEmp = async (data) => {
         console.log(data);
         if (data.length < 1) {
             console.log("no data found");
-
         } else {
             return retdata = data
         }
@@ -52,17 +49,13 @@ export const targetCountTodayByEmp = async (data) => {
 
 // update manager
 export const updateEmployee = async (data) => {
-
     let query = { _id: data.id }
-    // console.log(data);
-
     Employee.findOne(query).exec().then(found_employee => {
         if (found_employee < 1) {
             return res.status(402).json({
                 message: "No employee data found",
             });
         } else {
-
             if (data.username) { found_employee.username = data.username }
             if (data.password) { found_employee.password = pass }
             if (data.fname) { found_employee.fname = data.fname }
@@ -79,28 +72,22 @@ export const updateEmployee = async (data) => {
             if (data.member_id) { found_employee.member_id = data.member_id }
             if (data.role) { found_employee.role = data.role }
             if (data.marks !== 'undefined') { found_employee.marks = data.marks }
-            // console.log(found_employee.marks);
 
             found_employee.save((err, updated_object) => {
                 if (err) { return next(err) }
 
                 console.log("update emp success");
 
-
             })
-
         }
-
     }).catch((err) => {
         console.log(err);
-
     });
 }
 
 
 //get filtered empsalarys by employee
 export const getEmpSalarysByEmp = async (data) => {
-    // console.log(data.id);
     let query = {
         path: 'employee_id',
         match: {
@@ -117,7 +104,6 @@ export const getEmpSalarysByEmp = async (data) => {
             });
             retdata = empsalarys
         }
-
     }).catch((err) => {
         console.log(err);
         res.status(500).json({
@@ -144,7 +130,6 @@ export const updateEmpSalary = async (data) => {
             });
             let startday = moment().subtract(1, 'months').startOf('month').date(28).format('YYYY-MM-DD hh:mm')
             let endday = moment().date(27).format('YYYY-MM-DD hh:mm')
-            // console.log(startday, "----", endday);
 
             tasks.map((item) => {
                 if (moment(item.deadline).isBetween(startday, endday)) {
@@ -164,8 +149,6 @@ export const updateEmpSalary = async (data) => {
         });
     });
 
-    // console.log("totsal- ", tempsalary);
-    // console.log(data.id);
     let query = {
         path: 'employee_id',
         match: {
@@ -174,10 +157,8 @@ export const updateEmpSalary = async (data) => {
     }
 
     EmpSalary.find().populate(query).exec().then(found_empsalary => {
-        // console.log(found_empsalary);
         if (found_empsalary < 1) {
             console.log("No empsalary data found");
-
         } else {
             found_empsalary.map((emps) => {
                 if (emps.month == data.month) {
@@ -201,7 +182,6 @@ export const updateEmpSalary = async (data) => {
                 }
             })
         }
-
     }).catch((err) => {
         console.log(err);
         res.status(500).json({
@@ -245,18 +225,14 @@ export const createMarkslog = async (data) => {
             if (err) {
                 console.log(err);
                 console.log("Error happended when creating marks log.");
-
                 return
             }
-
             console.log("Markslog successfully logged!");
-
             return
         });
     } catch (err) {
         // Implement logger function (winston)
         console.log("Unable to create log.");
-
     }
 };
 
@@ -265,7 +241,6 @@ export const createMarkslog = async (data) => {
 export const createTotTC = async (data) => {
     let totdata;
     try {
-
         var now = new Date();
         var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         // var startOfToday = new Date(2021, 8, 15);
@@ -277,7 +252,6 @@ export const createTotTC = async (data) => {
         ])
         await query.then((data) => {
 
-            // console.log("--data", data);
 
             if (data.length < 1) {
                 console.log(" No task data found");
@@ -286,10 +260,7 @@ export const createTotTC = async (data) => {
                 totdata = data;
             }
         }).then(() => {
-            // console.log(totdata);
-            // let sendnewdata = {
 
-            // }
             const newTotTC = new totalTC(totdata[0]);
             newTotTC.save(function (err) {
                 if (err) {
@@ -304,8 +275,91 @@ export const createTotTC = async (data) => {
 
 
     } catch (err) {
-        // Implement logger function (winston)
         console.log("Unable to create log.");
 
     }
 };
+
+
+//Detect anomaly of last data points and send email notification
+export const anomalyNotify = async (req, res, next) => {
+
+    //array to store employee marks
+    let newseries = [];
+    //array to store mean value of factory daily output
+    let meanseries = [];
+    //employee array
+    let empArr = [];
+    //anomalize employee array
+    let anoEmpsArr = []
+    //anomalize fcatory array
+    let anoFacArr = []
+
+
+    //get all employees to an array
+    await Employee.find({}).exec().then((user) => {
+        if (user.length < 1) {
+            console.log("No user found");
+        } else {
+            let data = user;
+            empArr = data.map((item) => {
+                return (
+                    {
+                        empid: item._id,
+                        username: item.username
+                    }
+                )
+            })
+        }
+    }).catch((err) => { console.log(err); });
+
+
+    //function to get anomaly of last day performance of every employee
+    let temp = empArr.map(async (empid) => {
+
+        // append newseries array with employee marks and timestamp
+        await Data_log.getMarksByEmpAno({ query: empid }).then((result) => {
+            let temparr = result;
+            newseries = temparr.map((log) => {
+                return ({ timestamp: moment(log.created_at).format("YYYY-MM-DD"), value: log.marks })
+            })
+        })
+
+        // if employee has at lease 12 days data, will send to detect anomaly
+        if (newseries.length >= 12) {
+            await azadController.azLastPointDetect(newseries).then((result) => {
+                anoEmpsArr.push({ id: empid.empid, isAno: result, username: empid.username })
+            }).then(() => {
+                return true
+            })
+        }
+    })
+
+    await Promise.all(temp).then(() => {
+        console.log("Employee anomaly detection Done!");
+    })
+
+
+    //function to get data for factory overall performance
+    await Data_log.getAllTotalTCAno().then((result) => {
+        let temparr = result;
+        temparr.forEach((log) => {
+            //calculate mean value
+            let mean = (log.completedtot / log.targetot) * 100
+            //data need to detect anomaly
+            meanseries.push({ timestamp: moment(log.created_at).format("YYYY-MM-DD"), value: mean })
+        })
+    })
+
+    // if has at lease 12 days data, will send to detect anomaly
+    if (meanseries.length >= 12) {
+        await azadController.azLastPointDetect(meanseries).then((result) => {
+            anoFacArr.push(result)
+        }).then(() => {
+            return true
+        })
+    }
+
+    Mailer.notifyMail([anoEmpsArr, anoFacArr])
+
+}

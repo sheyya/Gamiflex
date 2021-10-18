@@ -3,20 +3,13 @@ import {
     Row,
     Col,
     Card,
-    NavLink,
     CardBody,
     Container,
     Button,
-    UncontrolledTooltip,
     Form,
     FormGroup,
     Input,
     Label,
-    NavItem,
-    Progress,
-    TabContent,
-    TabPane,
-    Alert,
     Dropdown,
     DropdownToggle,
     DropdownMenu,
@@ -24,8 +17,7 @@ import {
 } from "reactstrap";
 import "./users.scss";
 import moment from "moment"
-import { Link, RouteComponentProps, useLocation } from "react-router-dom";
-import classnames from "classnames";
+import { useLocation } from "react-router-dom";
 import Task from "../../controllers/task";
 import Admin from "../../controllers/admin";
 import { MainTable } from "../../components/MainTable";
@@ -36,47 +28,18 @@ import useAuth from "../../useAuth";
 import jwt from 'jwt-decode'
 
 export const Tasks = (props) => {
-    const [activeTabProgress, setActiveTabProgress] = useState(1);
-    const [progressValue, setProgressValue] = useState(25);
     const [modal_addTask, setModal_addTask] = useState(false);
     const [modal_addTaskType, setModal_addTaskType] = useState(false);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [dropdownOpenGroup, setDropdownOpenGroup] = useState(false);
-    const [dropdownOpenWallet, setDropdownOpenWallet] = useState(false);
     const toggleDropdown = () => setDropdownOpen((prevState) => !prevState);
-    const toggleDropdownGroup = () => setDropdownOpenGroup((prevState) => !prevState);
-    const toggleDropdownWallet = () => setDropdownOpenWallet((prevState) => !prevState);
-    const [isvalid, setisvalid] = useState(false);
     const [data, setData] = useState([]);
     const [meta, setMeta] = useState({});
     const { user } = useAuth();
     const userdatatk = localStorage.getItem('usertoken');
     let role = user.role || jwt(userdatatk).role;
 
-
-
-    //increment wizard page
-    const toggleTabProgress = (tab) => {
-        if (activeTabProgress !== tab) {
-            if (tab >= 1 && tab <= 4) {
-                setActiveTabProgress(tab);
-
-                if (tab === 1) {
-                    setProgressValue(25);
-                }
-                if (tab === 2) {
-                    setProgressValue(50);
-                }
-                if (tab === 3) {
-                    setProgressValue(75);
-                }
-                if (tab === 4) {
-                    setProgressValue(100);
-                }
-            }
-        }
-    };
+    // toggle Modals
     const toggleTask = () => setModal_addTask(!modal_addTask);
     const toggleTaskType = () => setModal_addTaskType(!modal_addTaskType);
 
@@ -94,7 +57,7 @@ export const Tasks = (props) => {
         deadline: "",
     })
 
-    //get task type data
+    //set task type data on change
     const [taskTypeState, setTaskTypeState] = useState({
         department: "",
         main_product: "",
@@ -102,17 +65,20 @@ export const Tasks = (props) => {
         price: 0,
     })
 
+    //set task type data
     const [getDataT, setGetDataT] = useState([{
         value: "",
         name: "",
         typeid: ""
     }])
 
+    //set employee data
     const [getDataE, setGetDataE] = useState([{
         empIDs: "",
         empid: "",
     }])
 
+    //set manager data
     const [getDataM, setGetDataM] = useState([{
         mngrIDs: "",
         mngrid: ""
@@ -122,97 +88,77 @@ export const Tasks = (props) => {
     //handle input changes for tasks
     const handleChange = (e) => {
         const value = e.target.value;
-        console.log(value);
-
         setTaskState({
             ...taskState,
             [e.target.name]: value
         });
     }
 
-    const handleTaskTypeChange = (value) => {
-        console.log(value);
 
+    //handle input changes for tasks type form
+    const handleTaskTypeChange = (value) => {
         setTaskState(
             {
                 ...taskState, task_type: value
             }
         )
-        console.log(taskState.task_type);
-
     }
 
+    //handle input changes for tasks employee
     const handleEmployeeIDChange = (value) => {
-        console.log(value);
-
         setTaskState(
             {
                 ...taskState, assignee: value
             }
         )
-        console.log(taskState.assignee);
-
     }
 
+    //handle input changes for tasks manager
     const handleManagerIDChange = (value) => {
-        console.log(value);
-
         setTaskState(
             {
                 ...taskState, manager: value
             }
         )
-        console.log(taskState.manager);
-
     }
 
-    //handle input changes fro tasktypes
+    //handle input changes for tasktypes
     const handleChangeT = (e) => {
         const value = e.target.value;
-        console.log(value);
-
         setTaskTypeState({
             ...taskTypeState,
             [e.target.name]: value
         });
     }
 
-
-
-
     const location = useLocation();
 
-    useEffect(() => {
-        console.log("hi");
 
+    useEffect(() => {
         let urldata = window.location.pathname.split("/");
         let dataid = urldata[urldata.length - 1];
-        console.log(urldata[urldata.length - 2]);
         let userid = jwt(userdatatk).user_id
-        console.log(role);
 
         if (urldata[urldata.length - 2] === "delete") {
             showDeleteConfirm(dataid);
         } else {
 
-            if (role == "admin" || role == "manager") {
+            if (role === "admin" || role === "manager") {
                 loadAllTasks(null);
                 loadAllTaskType();
             }
-            if (role == "employee") {
-                loadtaskbyemp(userid)
+            if (role === "employee") {
+                loadtaskbyemp({ id: userid })
             }
         }
 
     }, [location]);
 
     //delete confirmation
-
     const { confirm } = Modal;
     const { Option } = Select;
 
     function showDeleteConfirm(data) {
-
         confirm({
             title: 'Are you sure delete this?',
             icon: <ExclamationCircleOutlined />,
@@ -228,9 +174,11 @@ export const Tasks = (props) => {
             },
         });
     }
+
     // loading message key
     const key = 'loading';
 
+    // Task delete function
     const deleteTasks = (params) => {
         message.loading({ content: 'Deleting...', key, duration: 0 })
         Task.deleteTask(params)
@@ -247,17 +195,11 @@ export const Tasks = (props) => {
             })
     };
 
-
-
-
-
     //getall tasktypes, managers, employees IDS
     const loadAllTaskType = async () => {
-        // setLoading(true)
         await Task.getAllTaskTypes()
             .then((result) => {
                 const data = result.taskTypes;
-                console.log(data);
                 setGetDataT(data.map((item) => {
                     return (
                         {
@@ -267,10 +209,7 @@ export const Tasks = (props) => {
                         }
                     )
                 }))
-                // setLoading(false)
-            })
-            .catch((err) => {
-            })
+            }).catch((err) => { console.log(err); })
 
         await Admin.getAllEmployees().then((result) => {
             const data = result.data;
@@ -283,10 +222,7 @@ export const Tasks = (props) => {
                     }
                 )
             }))
-            // setLoading(false)
-        })
-            .catch((err) => {
-            })
+        }).catch((err) => { console.log(err); })
 
         await Admin.getAllManagers().then((result) => {
             const data = result.managers;
@@ -298,27 +234,20 @@ export const Tasks = (props) => {
                     }
                 )
             }))
-            // setLoading(false)
-        })
-            .catch((err) => {
-            })
-
+        }).catch((err) => { console.log(err); })
     }
 
     //getall tasks
     const loadAllTasks = (params) => {
-
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         Task.getAllTasks(params)
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
-                console.log(rdata);
-
+                setMeta(result.meta)
                 setData(rdata.map((item) => {
                     const udate = moment(item.updated_at).format('MMM DD - HH:mm')
                     const deaddate = moment(item.deadline).format('MMM DD - HH:mm')
-
                     return (
                         {
                             id: item._id,
@@ -328,14 +257,12 @@ export const Tasks = (props) => {
                             manager: item.manager.member_id,
                             target: item.target,
                             completed: item.completed,
-                            status: item.status == "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : item.status == "ongoing" ? <div className="badge badge-soft-warning font-size-14">{item.status}</div> : item.status == "expired" ? <div className="badge badge-soft-secondary font-size-14">{item.status}</div> : <div className="badge badge-soft-info font-size-14">{item.status}</div>,
+                            status: item.status === "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : item.status === "ongoing" ? <div className="badge badge-soft-warning font-size-14">{item.status}</div> : item.status === "expired" ? <div className="badge badge-soft-secondary font-size-14">{item.status}</div> : <div className="badge badge-soft-info font-size-14">{item.status}</div>,
                             deadline: deaddate,
                             updated_at: udate
                         }
                     )
                 }))
-
-
             })
             .catch((err) => {
                 console.log(err);
@@ -345,19 +272,16 @@ export const Tasks = (props) => {
 
     //getall tasks by employee
     const loadtaskbyemp = (params) => {
-        console.log(params);
-
+        let userid2 = jwt(userdatatk).user_id
+        params.id = userid2
         message.loading({ content: 'Data Loading...', key, duration: 0 })
-        Task.getTaskByEmployee({ id: params })
+        Task.getTaskByEmployee(params)
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
-                console.log(rdata);
-
                 setData(rdata.map((item) => {
                     const udate = moment(item.updated_at).format('MMM DD - HH:mm')
                     const deaddate = moment(item.deadline).format('MMM DD - HH:mm')
-
                     return (
                         {
                             id: item._id,
@@ -367,14 +291,12 @@ export const Tasks = (props) => {
                             manager: item.manager.member_id,
                             target: item.target,
                             completed: item.completed,
-                            status: item.status == "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
+                            status: item.status === "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
                             deadline: deaddate,
                             updated_at: udate
                         }
                     )
                 }))
-
-
             })
             .catch((err) => {
                 console.log(err);
@@ -390,10 +312,9 @@ export const Tasks = (props) => {
                     <div className="page-title-box">
                         <h4 className="mb-0">Tasks</h4>
                     </div>
-
                     <Row>
                         <Col xs={12}>
-                            {role == "admin" || role == "manager" ? <Button
+                            {role === "admin" || role === "manager" ? <Button
                                 onClick={() => {
                                     setModal_addTask(true);
                                     setIsAlertOpen(false);
@@ -404,7 +325,7 @@ export const Tasks = (props) => {
                                 <i className="ri-user-add-line align-middle"></i>
                                 <span className="mx-2">Add Task</span>
                             </Button> : <></>}
-                            {role == "admin" ? <Button
+                            {role === "admin" ? <Button
                                 onClick={() => {
                                     setModal_addTaskType(true);
                                 }}
@@ -417,8 +338,9 @@ export const Tasks = (props) => {
                             <Card>
                                 <CardBody>
                                     <MainTable
+                                        meta={meta}
                                         data={data}
-                                        handlePageChange={role == "admin" || role == "manager" ? loadAllTasks : loadtaskbyemp}
+                                        handlePageChange={role === "admin" || role === "manager" ? loadAllTasks : loadtaskbyemp}
                                         columns={[
                                             { label: "Task Name", field: "task_type" },
                                             { label: "Department", field: "department" },
@@ -445,9 +367,7 @@ export const Tasks = (props) => {
                         maskClosable={false}
                         visible={modal_addTask}
                         onOk={() => {
-
                             Task.createTasks({ ...taskState, updated_at: Date.now(), created_at: Date.now() }).then((result) => {
-                                console.log(taskState.deadline);
                                 toggleTask()
                                 setTaskState({
                                     status: "ongoing",
@@ -462,12 +382,7 @@ export const Tasks = (props) => {
                                 loadAllTasks(null);
                                 loadAllTaskType()
 
-                            })
-                                .catch(err => {
-                                    console.log(err);
-
-                                })
-
+                            }).catch(err => { console.log(err); })
                         }}
                         onCancel={toggleTask}
                         width={1000}
@@ -563,7 +478,6 @@ export const Tasks = (props) => {
                                 </Col>
                             </Row>
                             <Row>
-
                                 <Col lg="6">
                                     <FormGroup>
                                         <Label for="target">Target</Label>
@@ -606,12 +520,7 @@ export const Tasks = (props) => {
                                         price: 0,
                                     })
                                 })
-
-                            })
-                                .catch(err => {
-                                    console.log(err);
-
-                                })
+                            }).catch(err => { console.log(err); })
 
                         }}
                         onCancel={toggleTaskType}
@@ -619,7 +528,6 @@ export const Tasks = (props) => {
                     >
                         <Form>
                             <Row>
-
                                 <Col lg="6">
                                     <FormGroup>
                                         <Label for="department">Department</Label>

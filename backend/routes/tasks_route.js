@@ -14,20 +14,9 @@ const userAuth = passport.authenticate("jwt", { session: false });
 const checkRole = roles => (req, res, next) => {
     if (!roles.includes(req.user.role)) {
         res.status(401).json("Unauthorized");
-        // console.log("Unauthorised");
         return;
     } else next();
 }
-
-
-router.post(
-    "/admin-protectd",
-    userAuth, checkRole(["admin"]),
-    async (req, res) => {
-        return res.status(200).json("Hello Admin");
-    }
-);
-
 
 
 //===========tasks===========
@@ -48,6 +37,5 @@ router.post('/tsktype', userAuth, checkRole(["admin"]), taskController.createTas
 router.get('/tsktype/:id', userAuth, checkRole(["admin", "manager"]), taskController.getTaskTypeByid);
 router.patch('/tsktype/:id', userAuth, checkRole(["admin"]), taskController.updateTaskType);
 router.delete('/tsktype/:id', userAuth, checkRole(["admin"]), taskController.deleteTaskType);
-
 
 export default router;

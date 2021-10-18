@@ -8,7 +8,6 @@ import {
     CardBody,
     Container,
     Button,
-    UncontrolledTooltip,
     Form,
     FormGroup,
     Input,
@@ -28,7 +27,7 @@ import {
 } from "reactstrap";
 import "./users.scss";
 import moment from "moment"
-import { Link, RouteComponentProps, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import classnames from "classnames";
 import Admin from "../../controllers/admin";
 import { MainTable } from "../../components/MainTable";
@@ -52,14 +51,11 @@ export const Managers = (props) => {
     const [data, setData] = useState([]);
     const [meta, setMeta] = useState({});
 
-
-
     //increment wizard page
     const toggleTabProgress = (tab) => {
         if (activeTabProgress !== tab) {
             if (tab >= 1 && tab <= 4) {
                 setActiveTabProgress(tab);
-
                 if (tab === 1) {
                     setProgressValue(25);
                 }
@@ -79,11 +75,11 @@ export const Managers = (props) => {
             }
         }
     };
+    // toggle manager registration modal
     const toggle = () => setModal_static(!modal_static);
 
     //total manager count
     const [mngrCount, setmngrCount] = useState(0)
-
 
     //get user input data
     const [userState, setUserState] = useState({
@@ -104,14 +100,14 @@ export const Managers = (props) => {
         nominee: "",
         member_id: "",
         role: "manager"
-
     })
+
+    // loading message key
+    const key = 'loading';
 
     //handle input changes
     const handleChange = (e) => {
         const value = e.target.value;
-        console.log(value);
-
         setUserState({
             ...userState,
             [e.target.name]: value
@@ -133,25 +129,20 @@ export const Managers = (props) => {
                         setisvalid(true)
                         toggleTabProgress(activeTabProgress + 1);
                     }
-
                 }
                 else { setisvalid(false) }
                 break;
             default:
                 toggleTabProgress(activeTabProgress + 1);
                 break;
-
         }
     }
 
     const location = useLocation();
 
     useEffect(() => {
-        console.log("hi");
-
         let urldata = window.location.pathname.split("/");
         let userid = urldata[urldata.length - 1];
-        console.log(urldata[urldata.length - 2]);
 
         if (urldata[urldata.length - 2] === "delete") {
             showDeleteConfirm(userid);
@@ -178,10 +169,8 @@ export const Managers = (props) => {
 
 
     //delete confirmation
-
     const { confirm } = DelModal;
     function showDeleteConfirm(data) {
-
         confirm({
             title: 'Are you sure delete this?',
             icon: <ExclamationCircleOutlined />,
@@ -197,9 +186,8 @@ export const Managers = (props) => {
             },
         });
     }
-    // loading message key
-    const key = 'loading';
 
+    // Manager delete function
     const deleteManagers = (params) => {
         message.loading({ content: 'Deleting...', key, duration: 0 })
         Admin.deleteManager(params)
@@ -214,19 +202,16 @@ export const Managers = (props) => {
             })
     };
 
-
     //getall managers
     const loadAllManagers = (params) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         Admin.getAllManagers(params)
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
-                const rdata = result.managers;
+                const rdata = result.data;
                 setMeta(result.meta)
                 setData(rdata.map((item) => {
                     const date = moment(item.created_at).format('YYYY MMMM DD')
-                    console.log(date);
-
                     return (
                         {
                             id: item._id,
@@ -238,8 +223,6 @@ export const Managers = (props) => {
                         }
                     )
                 }))
-
-
             })
             .catch((err) => {
                 console.log(err);
@@ -255,7 +238,6 @@ export const Managers = (props) => {
                     <div className="page-title-box">
                         <h4 className="mb-0">Managers</h4>
                     </div>
-
                     <Row>
                         <Col xs={12}>
                             <Button
@@ -522,9 +504,7 @@ export const Managers = (props) => {
                                                 </Row>
                                                 <AvForm>
                                                     <Row>
-
                                                         <Col lg="6">
-
                                                             <Label for="password">Password</Label>
                                                             <AvField
                                                                 type="password"
@@ -546,7 +526,6 @@ export const Managers = (props) => {
                                                             />
                                                         </Col>
                                                         <Col lg="6">
-
                                                             <Label for="confirm-password">Confirm Password</Label>
                                                             <AvField
                                                                 type="password"
@@ -566,7 +545,6 @@ export const Managers = (props) => {
                                                                     }
                                                                 }}
                                                             />
-
                                                         </Col>
                                                     </Row>
                                                 </AvForm>
@@ -647,7 +625,6 @@ export const Managers = (props) => {
                                                                 </FormGroup>
                                                             </Col>
                                                         </Row>
-
                                                     </Col>
                                                 </Row>
                                             </Form>
@@ -672,25 +649,7 @@ export const Managers = (props) => {
                                                     <Row><Label className="d-inline-flex mb-2 "> Nominee : <p className="mx-2 mb-0 fw-light">{userState.nominee}</p></Label></Row>
                                                     <Row><Label className="d-inline-flex mb-2 "> Marital Status : <p className="mx-2 mb-0 fw-light">{userState.marital_status}</p></Label></Row>
                                                 </Col>
-                                                {/* <Col lg="4">
-                                                   
-                                                </Col> */}
                                             </Row>
-                                            {/* <Row className="mt-4">
-                                                <Col lg="12">
-                                                    <div className="text-center mx-auto" style={{ alignItems: "center", justifyContent: "center" }}>
-                                                        <div className="mb-4" >
-
-                                                            <div >
-
-                                                                <h5 ><i className="mdi mdi-check-circle-outline text-success display-6 px-2"></i> Confirm Detail</h5>
-                                                                 <p className="text-muted">If several languages coalesce, the grammar of the resulting</p> 
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </Col>
-                                            </Row> */}
                                         </div>
                                     </TabPane>
                                 </TabContent>
@@ -756,10 +715,7 @@ export const Managers = (props) => {
                                                     })
                                                     .catch(err => {
                                                         console.log(err);
-
                                                     })
-
-
                                             }}
                                             color="success"
                                         >

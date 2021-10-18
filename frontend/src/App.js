@@ -13,8 +13,6 @@ const App = () => {
         <BrowserRouter>
             <AuthProvider>
                 <Switch>
-                    {/* <Route path="/" exact component={Admin_Signin} />
-        <Route path="/dashboard" component={Layout} /> */}
                     {routes.map((route, idx) => (
                         <AppRoute
                             path={route.path}
@@ -23,7 +21,6 @@ const App = () => {
                             isAuthenticated={route.isAuth}
                         />
                     ))}
-
                 </Switch>
             </AuthProvider>
         </BrowserRouter>

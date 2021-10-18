@@ -8,6 +8,7 @@ import logosmdark from "../assets/images/logo-sm-dark.png";
 import logodark from "../assets/images/logo-dark.png";
 import logosmlight from "../assets/images/logo-sm-light.png";
 import logolight from "../assets/images/logo-light.png";
+
 import useAuth from "../useAuth";
 import jwt from 'jwt-decode'
 
@@ -17,10 +18,9 @@ const toggleMenu = () => {
 };
 
 export function Header(props) {
+  //get current user data
   const userdata = localStorage.getItem('usertoken');
-  const { user } = useAuth();
-  console.log(user);
-
+  
   return (
     <React.Fragment>
       <header id="page-topbar">

@@ -2,6 +2,8 @@
 import Task from '../models/tasks.js';
 import TaskType from '../models/tasks_types.js';
 import mongoose from 'mongoose';
+import { global_search } from '../config/global_search.js'
+import { getPagination, getPagingData } from '../config/pagination.formatter.js'
 
 //----- TASKS -----//
 
@@ -9,10 +11,7 @@ import mongoose from 'mongoose';
 export const createTask = async (req, res) => {
     try {
         const tskDetails = req.body;
-        console.log(tskDetails);
-
         const newTask = new Task(tskDetails);
-
         await newTask.save(function (err) {
             if (err) {
                 console.log(err);
@@ -39,8 +38,18 @@ export const createTask = async (req, res) => {
 };
 
 //get all tasks
-export const getTasks = function (req, res, next) {
-    Task.find({}).
+export const getTasks = async function (req, res, next) {
+    const { page, size, search } = req.query;
+    const { limit, offset } = getPagination(page, size);
+
+    //global search
+    let columns = ["main_product", "department", "assignee.member_id", "manager.member_id", "status",]
+    let where = search ? global_search(columns, search) : {};
+    let pageCount = await Task.find(where);
+    let all_data = Task.find(where).sort({ created_at: -1 }).skip(offset).limit(limit);
+
+
+    all_data.
         populate({ path: 'task_type', select: 'main_product department sub_product' }).
         populate({ path: 'assignee', select: 'member_id' }).
         populate({ path: 'manager', select: 'member_id' }).exec().then((user) => {
@@ -49,12 +58,10 @@ export const getTasks = function (req, res, next) {
                     message: "No tasks data availble",
                 });
             } else {
-                // console.log(user);
-
                 return res.status(200).json({
                     success: true,
                     code: 200,
-                    data: user,
+                    ...getPagingData(user, page, limit, pageCount.length),
                 });
             }
         })
@@ -68,7 +75,6 @@ export const getTasks = function (req, res, next) {
 
 // update taskType
 export const updateTask = async (req, res, next) => {
-    let pass;
 
     let query = { _id: req.body.id }
     Task.findOne(query).exec().then(found_task => {
@@ -77,7 +83,6 @@ export const updateTask = async (req, res, next) => {
                 message: "No taskType data found",
             });
         } else {
-
             if (req.body.task_name) { found_task.task_name = req.body.task_name }
             if (req.body.department) { found_task.department = req.body.department }
             if (req.body.assignee) { found_task.assignee = req.body.assignee }
@@ -101,9 +106,7 @@ export const updateTask = async (req, res, next) => {
                 });
 
             })
-
         }
-
     }).catch((err) => {
         console.log(err);
         res.status(500).json({
@@ -139,17 +142,19 @@ export const getTaskByid = (req, res, next) => {
 }
 
 //get filtered tasks by employee
-export const getTasksByEmp = (req, res, next) => {
+export const getTasksByEmp = async (req, res, next) => {
 
-    let query = {
-        path: 'assignee',
-        match: {
-            _id: req.query.id
-        }
-    }
-    // console.log(req.query.id);
+    const { page, size, search } = req.query;
+    const { limit, offset } = getPagination(page, size);
 
-    Task.find({ assignee: req.query.id }).populate('manager assignee task_type').exec().then(tasks => {
+    //global search
+    let columns = ["main_product", "department", "assignee.member_id", "manager.member_id", "status",]
+    let where = search ? global_search(columns, search) : {};
+    let pageCount = await Task.find(where);
+    let all_data = Task.find(where).sort({ created_at: -1 }).skip(offset).limit(limit);
+
+    all_data.find({ assignee: req.query.id }).populate('manager assignee task_type').exec().then(tasks => {
+
         if (tasks < 1) {
             return res.status(402).json({
                 message: "No task data found",
@@ -161,7 +166,7 @@ export const getTasksByEmp = (req, res, next) => {
             res.status(200).json({
                 success: true,
                 code: 200,
-                data: tasks,
+                ...getPagingData(tasks, page, limit, pageCount.length),
             });
         }
 
@@ -177,7 +182,6 @@ export const getTasksByEmp = (req, res, next) => {
 export const deleteTask = (req, res, next) => {
 
     let query = { _id: req.params.id }
-    // console.log(req.params.id);
 
     Task.findOne(query).exec().then(found_task => {
         if (found_task < 1) {
@@ -231,7 +235,6 @@ export const taskCountTodayByEmp = async (req, res) => {
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     // console.log(req.query.id);
 
-
     let getemp = {
         path: 'assignee',
         match: {
@@ -281,16 +284,13 @@ export const targetCountToday = async (req, res) => {
 export const targetCountTodayByEmp = async (req, res) => {
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    // console.log("id", req.query.id);
 
-    console.log(startOfToday);
 
     var query = Task.aggregate([
         { $match: { created_at: { $gte: startOfToday }, assignee: mongoose.Types.ObjectId(req.query.id) } },
         { $group: { _id: req.body.id, totarget: { $sum: "$target" }, totcompleted: { $sum: "$completed" } } }
     ])
     query.then((data) => {
-        // console.log(data);
 
         if (data.length < 1) {
             return res.status(402).json({
@@ -361,7 +361,6 @@ export const getTaskTypes = function (req, res, next) {
 
 // update taskType
 export const updateTaskType = async (req, res, next) => {
-    let pass;
     let query = { _id: req.params.id }
     TaskType.findOne(query).exec().then(found_taskType => {
         if (found_taskType < 1) {
@@ -385,11 +384,8 @@ export const updateTaskType = async (req, res, next) => {
                     code: 200,
                     data: updated_object,
                 });
-
             })
-
         }
-
     }).catch((err) => {
         console.log(err);
         res.status(500).json({
@@ -400,7 +396,6 @@ export const updateTaskType = async (req, res, next) => {
 
 //get taskTypes by id
 export const getTaskTypeByid = (req, res, next) => {
-
     let query = { _id: req.params.id }
 
     TaskType.findOne(query).exec().then(taskType => {
@@ -415,7 +410,6 @@ export const getTaskTypeByid = (req, res, next) => {
                 data: taskType,
             });
         }
-
     }).catch((err) => {
         console.log(err);
         res.status(500).json({
@@ -427,7 +421,6 @@ export const getTaskTypeByid = (req, res, next) => {
 
 //delete taskType
 export const deleteTaskType = (req, res, next) => {
-
     let query = { _id: req.params.id }
 
     TaskType.findOne(query).exec().then(found_taskType => {
@@ -444,11 +437,8 @@ export const deleteTaskType = (req, res, next) => {
                     code: 200,
                     data: result,
                 });
-
             })
-
         }
-
     }).catch((err) => {
         console.log(err);
         res.status(500).json({

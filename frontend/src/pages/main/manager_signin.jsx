@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import {
   Row,
   Col,
-  Input,
   Button,
   Alert,
   Container,
   Label,
   FormGroup,
 } from "reactstrap";
-import { Link, RouteComponentProps } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AvForm, AvField } from "availity-reactstrap-validation";
 import Manager from "../../controllers/manager";
 import { withRouter } from 'react-router-dom'
@@ -45,7 +44,6 @@ const Manager_Signin = () => {
     );
 
     switch (status) {
-
       // user not found
       case 400:
         await setError(
@@ -62,7 +60,6 @@ const Manager_Signin = () => {
         window.location.replace('/dashboard/overview/mngr')
         break;
     }
-
   }
 
   return (
@@ -89,14 +86,9 @@ const Manager_Signin = () => {
                                     <img src={logodark} height="40" alt="logo" />
                                   </Link>
                                 </div>
-
                                 <h4 className="font-size-18 mt-2 badge text-dark bg-gami">Manager Login</h4>
                               </div>
-
                               {error ? <Alert color="danger">{error}</Alert> : null}
-
-
-
                               <div className="p-2 mt-3">
                                 <AvForm
                                   className="form-horizontal"
@@ -133,21 +125,6 @@ const Manager_Signin = () => {
                                       placeholder="Enter password"
                                     />
                                   </FormGroup>
-
-                                  {/* <div className="custom-control custom-checkbox">
-                              <Input
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="customControlInline"
-                              />
-                              <Label
-                                className="custom-control-label"
-                                htmlFor="customControlInline"
-                              >
-                                Remember me
-                              </Label>
-                            </div> */}
-
                                   <div className="mt-4 text-center">
                                     <Button
                                       className="w-50 waves-effect bg-gami waves-light"
@@ -157,16 +134,6 @@ const Manager_Signin = () => {
                                       {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : "Log In"}
                                     </Button>
                                   </div>
-
-                                  {/* <div className="mt-4 text-center">
-                              <Link
-                                to="/forgot-password"
-                                className="text-muted"
-                              >
-                                <i className="mdi mdi-lock mr-1"></i> Forgot
-                                your password?
-                              </Link>
-                            </div> */}
                                 </AvForm>
                               </div>
                             </div>

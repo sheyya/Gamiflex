@@ -66,12 +66,12 @@ class Task {
     })
   }
 
-  async getTaskByEmployee(data) {
-    console.log(data);
+  async getTaskByEmployee(params) {
+    console.log("--param", params);
 
     const config = {
       headers: { Authorization: `${localStorage.getItem('usertoken')}` },
-      params: data
+      params
     };
     return new Promise((resolve, reject) => {
       return axios.get(`${Config.host}${Config.port}${api.taskbyemp}`, config)

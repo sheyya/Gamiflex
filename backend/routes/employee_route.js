@@ -14,12 +14,9 @@ const userAuth = passport.authenticate("jwt", { session: false });
 const checkRole = roles => (req, res, next) => {
     if (!roles.includes(req.user.role)) {
         res.status(401).json("Unauthorized");
-        // console.log("Unauthorised");
         return;
     } else next();
 }
-
-
 
 //==========employees===========
 router.post('/signin', employeeController.employeeLogin);

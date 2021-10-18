@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import logodark from "../../assets/images/logo-dark.png";
-import dayjs from "dayjs";
+import { useLocation } from "react-router-dom";
 import "./dashboard.scss";
 import jwt from 'jwt-decode';
 import {
@@ -10,34 +8,26 @@ import {
     Col,
     Card,
     CardBody,
-    Media,
-    Modal,
-    ModalBody,
-    ModalHeader,
-    Table,
+    Media
 } from "reactstrap";
-import { VieweButton } from "../../components/Buttons";
 import { Leaderbord } from "../../components/leaderboard/leaderboard";
 import { Linechart } from "../../components/linechart";
 import Emp from "../../controllers/employee";
 import Mngr from "../../controllers/manager";
 import Tsk from "../../controllers/task";
-import { Switch } from "antd";
 import useAuth from "../../useAuth";
+import Admin from "../../controllers/admin";
+import moment from "moment"
 
 
 export function Overview(props) {
     const { user } = useAuth();
-    const [modal_static, setModal_static] = useState(false);
-    const [meta, setMeta] = useState({});
-    const [invoiceList, setInvoiceList] = useState([]);
-    const userdatatk = localStorage.getItem('usertoken');
-    let role = user.role || jwt(userdatatk).role;
-    let userid = jwt(userdatatk).user_id
-    let mngr_mid;
-    // const [countData, setCountData] = useState({
-    //     mngrcountc: 0, empcountc: 0, taskcountc: 0, taskcountbyempc: 0, targetcount: 0, completedcount: 0
-    // })
+
+    //get user token from local and retreive user role
+    const userDataToken = localStorage.getItem('usertoken');
+    let role = user.role || jwt(userDataToken).role;
+    let userid = jwt(userDataToken).user_id
+
     const [loading, setLoading] = useState(false)
     const [mngrcountc, setMngrcountc] = useState(0)
     const [empcountc, setEmpcountc] = useState(0)
@@ -45,38 +35,38 @@ export function Overview(props) {
     const [taskcountbyempc, setTaskcountbyempc] = useState(0)
     const [targetcount, setTargetcount] = useState(0)
     const [completedcount, setCompletedcount] = useState(0)
+    const [prevSalary, setPrevSalary] = useState(0);
+
     const location = useLocation();
 
+    //Function to call one time at page reloads
     useEffect(() => {
+        //get current user id
+        userid = jwt(userDataToken).user_id
 
-        let urldata = window.location.pathname.split("/");
-        let req_id = urldata[urldata.length - 1];
-        console.log(urldata[urldata.length - 2]);
-        userid = jwt(userdatatk).user_id
-        role == "admin" || role == "manager" ? mngr_mid = jwt(userdatatk).member_id : mngr_mid = "";
-        console.log(role);
-
-        if (role == "admin") {
+        //call functions relevant to the user role
+        if (role === "admin") {
             getempcount();
             getmngrcount();
             gettaskscount();
             gettargetcount();
         }
-        else if (role == "manager") {
+        else if (role === "manager") {
             getempcount();
-            console.log(getempcount());
             gettaskscount();
             gettargetcount();
         }
-        else if (role == "employee") {
+        else if (role === "employee") {
             gettaskscountbyemp({ id: userid });
-            gettargetcountbyemp({ id: userid })
+            gettargetcountbyemp({ id: userid });
+            claculateSalary(userid)
         }
 
     }, [location]);
 
     let data;
 
+    // get employee count
     const getempcount = () => {
         let out;
         setLoading(true)
@@ -84,10 +74,6 @@ export function Overview(props) {
             .then((result) => {
                 out = result.count
                 setEmpcountc(out)
-                // setCountData(prevState => ({
-                //     ...prevState,
-                //     empcountc: out
-                // }));
                 setLoading(false)
             })
             .catch((err) => {
@@ -95,24 +81,17 @@ export function Overview(props) {
                 setLoading(false)
                 out = 0;
             });
-
         return ss;
     };
 
+    // get manager count
     const getmngrcount = () => {
         setLoading(true)
         const ss = Mngr.mngrCount()
             .then((result) => {
                 const out = result.count
-                // console.log(out);
                 setMngrcountc(out)
                 setLoading(false)
-                // setCountData(prevState => ({
-                //     ...prevState,
-                //     mngrcountc: out
-                // }));
-
-
             })
             .catch((err) => {
                 console.log(err);
@@ -122,18 +101,14 @@ export function Overview(props) {
         return ss
     };
 
+    // get task count
     const gettaskscount = () => {
         setLoading(true)
         const ss = Tsk.getTasksCountToday()
             .then((result) => {
                 const out = result.count
-                // console.log(out);
                 setTaskcountc(out)
                 setLoading(false)
-                // setCountData(prevState => ({
-                //     ...prevState,
-                //     taskcountc: out
-                // }));
                 return out;
             })
             .catch((err) => {
@@ -144,18 +119,14 @@ export function Overview(props) {
         return ss;
     };
 
+    // get task count for employee dashboard
     const gettaskscountbyemp = (userid) => {
         setLoading(true)
         const ss = Tsk.getTasksCountTodaybyEmp(userid)
             .then((result) => {
                 const out = result.count
-                // console.log(out);
                 setTaskcountbyempc(out)
                 setLoading(false)
-                // setCountData(prevState => ({
-                //     ...prevState,
-                //     taskcountbyempc: out
-                // }));
             })
             .catch((err) => {
                 console.log(err);
@@ -164,13 +135,13 @@ export function Overview(props) {
         return ss;
     };
 
+    // get target count
     const gettargetcount = () => {
         setLoading(true)
         Tsk.getTargetCountToday()
             .then((result) => {
                 const out = result.data
                 console.log(out);
-                // setCountData({ ...countData, targetcount: out[0].totarget, completedcount: out[0].totcompleted })
                 setTargetcount(out[0].totarget)
                 setCompletedcount(out[0].totcompleted)
                 setLoading(false)
@@ -179,21 +150,19 @@ export function Overview(props) {
                 console.log(err);
                 setLoading(false)
                 return 0
-
             });
     };
 
+    // get target count for employee dashboard
     const gettargetcountbyemp = (userid) => {
         setLoading(true)
         Tsk.getTargetCountTodaybyEmp(userid)
             .then((result) => {
                 const out = result.data
                 console.log(out);
-                // setCountData({ ...countData, targetcount: out[0].totarget, completedcount: out[0].totcompleted })
                 setTargetcount(out[0].totarget)
                 setCompletedcount(out[0].totcompleted)
                 setLoading(false)
-
             })
             .catch((err) => {
                 console.log(err);
@@ -201,6 +170,19 @@ export function Overview(props) {
             });
     };
 
+    // Get last salary for employee dashboard
+    const claculateSalary = async (userid) => {
+        Admin.getEmpSalaryByEmployee({ id: userid }).then((result) => {
+            const rdata = result.data;
+            console.log(rdata.length);
+            rdata.map((item) => {
+                //get previous month salary
+                if (item.month == moment().subtract(1, 'months').format('MMM YY')) {
+                    setPrevSalary(item.salary)
+                }
+            })
+        }).catch((err) => { console.log(err); })
+    }
 
     return (
         <React.Fragment>
@@ -210,7 +192,7 @@ export function Overview(props) {
                     <Row>
                         <Col xl={8}>
                             <Row>
-                                <Col md={3} className={role == "admin" || role == "manager" ? "d-block" : "d-none"}>
+                                <Col md={3} className={role === "admin" || role === "manager" ? "d-block" : "d-none"}>
                                     <Card>
                                         <CardBody>
                                             <Media>
@@ -227,7 +209,7 @@ export function Overview(props) {
                                         </CardBody>
                                     </Card>
                                 </Col>
-                                <Col md={3} className={role == "admin" ? "d-block" : "d-none"}>
+                                <Col md={3} className={role === "admin" ? "d-block" : "d-none"}>
                                     <Card>
                                         <CardBody>
                                             <Media>
@@ -252,7 +234,7 @@ export function Overview(props) {
                                                     <p className="text-truncate font-size-14 mb-2">
                                                         Today Tasks
                           </p>
-                                                    {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : <h4 className="mb-0">{role == "admin" || role == "manager" ? taskcountc : taskcountbyempc}</h4>}
+                                                    {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : <h4 className="mb-0">{role === "admin" || role === "manager" ? taskcountc : taskcountbyempc}</h4>}
                                                 </Media>
                                                 <div className="text-primary">
                                                     <i className="mdi mdi-receipt font-size-24"></i>
@@ -268,7 +250,7 @@ export function Overview(props) {
                                                 <Media body className="overflow-hidden">
                                                     <p className="text-truncate font-size-14 mb-2">
                                                         Today Targets
-                          </p>
+                                                    </p>
                                                     {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : <h4 className="mb-0">{completedcount}/<span className="text-muted"><small>{targetcount}</small></span></h4>}
                                                 </Media>
                                                 <div className="text-primary">
@@ -278,10 +260,27 @@ export function Overview(props) {
                                         </CardBody>
                                     </Card>
                                 </Col>
+                                <Col md={3} className={role === "employee" ? "d-block" : "d-none"}>
+                                    <Card>
+                                        <CardBody>
+                                            <Media>
+                                                <Media body className="overflow-hidden">
+                                                    <p className="text-truncate font-size-14 mb-2">
+                                                        {moment().subtract(1, 'months').format('MMMM')} Salary
+                                                    </p>
+                                                    {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : <h4 className="mb-0">{prevSalary.toFixed(2)} LKR</h4>}
+                                                </Media>
+                                                <div className="text-primary">
+                                                    <i className="mdi mdi-currency-usd font-size-24"></i>
+                                                </div>
+                                            </Media>
+                                        </CardBody>
+                                    </Card>
+                                </Col>
                             </Row>
                         </Col>
                     </Row>
-                    {role == "employee" ? <></> : <Row>
+                    {role === "employee" ? <></> : <Row>
                         <Col lg={10}>
                             <Linechart />
                         </Col>

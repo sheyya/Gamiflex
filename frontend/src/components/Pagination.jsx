@@ -1,10 +1,11 @@
 import React from "react";
-import { useState } from 'react'
 import ReactPaginate from 'react-paginate';
 
 
 
 export const Pagination = ({ meta, handlePageChange }) => {
+  console.log(meta);
+
   if (meta && meta.pages && meta.pages > 1) {
     return (
       <div className="">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { AvForm, AvField, AvInput } from "availity-reactstrap-validation";
-import { Link, RouteComponentProps, useLocation } from "react-router-dom";
+import { AvForm, AvField } from "availity-reactstrap-validation";
+import { useLocation } from "react-router-dom";
 import "./users.scss";
 import { Linechart } from "../../components/linechart";
 import {
@@ -17,13 +17,7 @@ import {
     DropdownItem,
     DropdownMenu,
     DropdownToggle,
-    Modal,
-    ModalBody,
-    ModalHeader,
-    Table,
-    UncontrolledTooltip,
 } from "reactstrap";
-import logodark from "../../assets/images/logo-dark.png";
 import Admin from "../../controllers/admin";
 import Task from "../../controllers/task";
 import { message } from "antd";
@@ -42,10 +36,11 @@ const Employee = (props) => {
     const toggleDropdownWallet = () => setDropdownOpenWallet((prevState) => !prevState);
     const location = useLocation();
     const [datat, setDatat] = useState([]);
-    let data = [];
     const { user } = useAuth();
     const userdatatk = localStorage.getItem('usertoken');
     let role = user.role || jwt(userdatatk).role;
+    const [meta, setMeta] = useState({});
+    const [prevSalary, setPrevSalary] = useState(0);
 
     const [userdata, setuserData] = useState({
         username: "",
@@ -70,7 +65,6 @@ const Employee = (props) => {
     const [enableEdit, setEnableEdit] = useState(false);
     const [tasksData, setTasksData] = useState([]);
     const [salaryData, setSalaryData] = useState({
-        id: "",
         employee_id: "",
         salary: 0,
         epf: 0,
@@ -78,8 +72,6 @@ const Employee = (props) => {
         month: "",
         bonus: 0
     });
-    // const [isAlertOpen, setIsAlertOpen] = useState(false);
-
 
     //handle input changes
     const handleChange = (e) => {
@@ -88,11 +80,9 @@ const Employee = (props) => {
             ...userdata,
             [e.target.name]: value,
         });
-
-
     };
 
-    //handle input changes
+    //handle input changes salary bonus
     const handleChangeB = (e) => {
         const value = e.target.value;
         setSalaryData({
@@ -103,32 +93,28 @@ const Employee = (props) => {
     };
 
     useEffect(() => {
-        // const userid = location.state.id;
-        // const isEdit = location.state.edit;
+        // Get employee id from url
         let urldata = window.location.pathname.split("/");
         let userid = (urldata[urldata.length - 1])
-        console.log(urldata[urldata.length - 2]);
-
+        // load data of employee
         loadEmployee(userid)
-
+        // Enable edit mode if edit button clicked
         if (urldata[urldata.length - 2] === "edit") {
             setEnableEdit(true);
         }
-
     }, [location]);
 
 
     // loading message key
     const key = 'loading';
 
+    // Load employee details function
     const loadEmployee = (params) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
-
         Admin.getEmployeeByID(params)
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const data = result.data;
-                console.log(data);
                 setuserData(
                     {
                         id: data._id,
@@ -148,18 +134,17 @@ const Employee = (props) => {
                         member_id: data.member_id,
                         role: data.role
                     }
-
                 );
             })
             .catch((err) => {
                 console.log(err);
-
             })
     };
 
-
+    // Function to update employee details
     const updateEmployee = async () => {
         message.loading({ content: 'Updating User...', key, duration: 0 })
+        // trim white spaces
         if (
             userdata.address.trim().length > 0 &&
             userdata.contact_num.trim().length > 0 &&
@@ -174,48 +159,40 @@ const Employee = (props) => {
             userdata.username.trim().length > 0 &&
             userdata.email.trim().length > 0
         ) {
+            // check password and conform password same
             if (userdata.pass === userdata.cpass) {
-                console.log(userdata);
                 Admin.updateEmployees(userdata).then((response) => {
-                    console.log(response);
                     message.success({ content: 'Data Updated Successfully', key, duration: 2 }).then(() => {
                         props.history.push('/dashboard/employees/')
                     })
-
                 }).catch(err => {
                     console.log(err);
-
                 })
             } else {
-                console.log(userdata);
-
                 message.error({ content: "Passwords needs to be same", key, duration: 2 });
                 console.log("Error");
             }
         } else {
-            console.log(userdata);
-
             message.error({ content: "Please fill all fields", key, duration: 2 });
             console.log("Error");
         }
     };
 
     //get tasks by employee
-    const loadAllTasksByEmp = (userid) => {
+    const loadAllTasksByEmp = (params) => {
         let urldata = window.location.pathname.split("/");
         let userida = urldata[urldata.length - 1];
         message.loading({ content: 'Data Loading...', key, duration: 0 })
-
-        Task.getTaskByEmployee({ id: userida })
+        params.id = userida
+        Task.getTaskByEmployee(params)
             .then((result) => {
+                setMeta(result.meta);
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
-                console.log(rdata);
                 setTasksData(rdata);
                 setDatat(rdata.map((item) => {
                     const udate = moment(item.updated_at).format('YY MMM DD - HH:mm')
                     const deaddate = moment(item.deadline).format('YY MMM DD - HH:mm')
-
                     return (
                         {
                             id: item._id,
@@ -225,60 +202,55 @@ const Employee = (props) => {
                             manager: item.manager.member_id,
                             target: item.target,
                             completed: item.completed,
-                            status: item.status == "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
+                            status: item.status === "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
                             deadline: deaddate,
                             updated_at: udate
                         }
                     )
                 }))
-
-
             })
             .catch((err) => {
                 console.log(err);
-
             })
     }
 
-    const getSalaryDetails = () => {
-        let urldata = window.location.pathname.split("/");
-        let userids = urldata[urldata.length - 1];
-
-
-    }
-
+    // Calculate salary function on load data button click
     const claculateSalary = async () => {
         message.loading({ content: 'Calculating', key, duration: 0 })
+        // get current user data
         let urldata = window.location.pathname.split("/");
         let userids = urldata[urldata.length - 1];
-        console.log(tasksData);
+        // define start and end date of saraly cycle
         const startOfMonth = moment().subtract(1, 'months').startOf('month').date(28).format('YYYY-MM-DD hh:mm')
         const endOfMonth = moment().date(27).format('YYYY-MM-DD hh:mm')
-        console.log(startOfMonth);
-        console.log(endOfMonth);
+
+        // current salary
         let cs = 0
+        // bonus
         let b = 0
+        // user id
         let id = ""
 
+        // Function to get salary bonus details form DB
         Admin.getEmpSalaryByEmployee({ id: userids }).then((result) => {
-            message.success({ content: 'Loaded!', key, duration: 2 });
+            message.success({ content: 'Done!', key, duration: 2 });
             const rdata = result.data;
-            console.log(rdata.length);
             rdata.map((item) => {
+                //find current month salary details
                 if (item.month == moment().format('MMM YY')) {
-                    console.log("done");
-                    console.log(item.bonus);
-
                     b = item.bonus
                     id = item._id
                 }
+                //get previous month salary
+                if (item.month == moment().subtract(1, 'months').format('MMM YY')) {
+                    setPrevSalary(item.salary)
+                }
             })
-
         }).catch((err) => {
             console.log(err);
             message.error({ content: 'Something Went Wrong!', key, duration: 2 })
         }).finally(() => {
-            console.log(salaryData);
+            // Finaly calculating salary using task data
             tasksData.map((item) => {
                 //get salary for completed tasks in current month
                 if (moment(item.deadline).isBetween(startOfMonth, endOfMonth)) {
@@ -292,14 +264,12 @@ const Employee = (props) => {
             setSalaryData({ bonus: b, id: id, salary: (cs) - (cs / 100 * 8), epf: cs / 100 * 20, etf: cs / 100 * 3 })
             message.success({ content: 'Done!', key, duration: 2 })
         })
-
     }
 
+    // Render employee chart with marks
     const showchart = () => {
         let urldata = window.location.pathname.split("/");
         let userid = urldata[urldata.length - 1];
-        console.log("sj-", userid);
-
         return (<Row>
             <Col lg={10}>
                 <Linechart empid={userid} />
@@ -307,27 +277,26 @@ const Employee = (props) => {
         </Row>)
     }
 
+    // Function to update bonus of employee
     const updateBonus = async () => {
         message.loading({ content: 'Updating Bonus...', key, duration: 0 })
         let urldata = window.location.pathname.split("/");
         let userids = urldata[urldata.length - 1];
-        console.log(moment().format('MMM YY'));
 
         setSalaryData({
             ...salaryData,
             month: moment().format('MMM YY'),
             employee_id: userids
         })
-        console.log(salaryData.id);
 
         await Admin.updateEmpSalary(salaryData).then(() => {
+            // Calculate salary again after updating bonus value
             claculateSalary()
             message.success({ content: 'Updated!', key, duration: 0 })
 
         }).catch((err) => {
             message.error({ content: 'Something Went Wrong!', key, duration: 2 })
         })
-
     }
 
     return (
@@ -335,7 +304,6 @@ const Employee = (props) => {
             <div className="page-content">
                 <Container fluid={true}>
                     <Row>
-
                         <Row>
                             <div className="page-title-box">
                                 <h4 className="mb-0">
@@ -369,6 +337,7 @@ const Employee = (props) => {
                                 </Col>
                             </div>
                         </Row>
+                        {/* Render marks chart */}
                         {showchart()}
                         <Col lg="6">
                             <Card>
@@ -743,7 +712,7 @@ const Employee = (props) => {
                                                     <Col lg="4">
                                                         <FormGroup>
                                                             <Label for="nic">Previous Month Salary Gained</Label>
-                                                            <p>15000 LKR</p>
+                                                            <p>{prevSalary.toFixed(2)} LKR</p>
                                                         </FormGroup>
                                                     </Col>
 
@@ -755,10 +724,10 @@ const Employee = (props) => {
                                                     </Col>
                                                 </Row>
                                                 <Row>
-                                                    <Col lg={role == "admin" ? "6" : "3"} >
+                                                    <Col lg={role === "admin" ? "6" : "3"} >
                                                         <FormGroup>
                                                             <Label for="bonus">Bonus</Label>
-                                                            {role == "admin" ? <div className="d-inline-flex" style={{ height: "40px" }}>
+                                                            {role === "admin" ? <div className="d-inline-flex" style={{ height: "40px" }}>
                                                                 <Input
                                                                     type="number"
                                                                     className="form-control w-50"
@@ -813,6 +782,7 @@ const Employee = (props) => {
                                         </div>
                                         <MainTable
                                             data={datat}
+                                            meta={meta}
                                             handlePageChange={loadAllTasksByEmp}
                                             columns={[
                                                 { label: "Task Name", field: "task_type" },

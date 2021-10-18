@@ -2,23 +2,16 @@ import React, { useState } from "react";
 import {
   Row,
   Col,
-  Input,
   Button,
-  Alert,
   Container,
-  Label,
-  FormGroup,
 } from "reactstrap";
 import { Link, useHistory } from "react-router-dom";
 import { withRouter } from 'react-router-dom'
 // import images
 import logodark from "../../assets/images/logo-dark.png";
 import welcome from "../../assets/images/welcome.png";
-import useAuth from "../../useAuth";
-
 
 const Home = () => {
-
 
   const history = useHistory();
 
@@ -46,12 +39,9 @@ const Home = () => {
                                     <img src={logodark} height="40" alt="logo" />
                                   </Link>
                                 </div>
-
                                 <h4 className="font-size-18 mt-2 badge text-dark bg-gami">Please Select a Portal</h4>
                               </div>
-
                               <div className="p-2 mt-3">
-
                                 <div className="mt-4 text-center">
                                   <Button
                                     className="w-50 waves-effect bg-gami waves-light"

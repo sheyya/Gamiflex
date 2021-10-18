@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import React from "react";
+import { NavLink } from "react-router-dom";
 import Admin from "../controllers/admin";
 import Manager from "../controllers/manager";
 import Employee from "../controllers/employee";
@@ -13,7 +13,6 @@ const changeSidebarTheme = (attribute, value) => {
 changeSidebarTheme("data-sidebar", "dark");
 
 export function SidebarContent(props) {
-  const [isOpen, setIsOpen] = useState(false);
   const { logout, user } = useAuth();
   const userdata = localStorage.getItem('usertoken');
   let role = user.role || jwt(userdata).role;
@@ -27,11 +26,10 @@ export function SidebarContent(props) {
     case "employee": logoutrole = Employee; break;
 
   }
-  const toggle = () => setIsOpen(!isOpen);
   let sidebarcontent;
   console.log(role);
 
-  if (role == "admin") {
+  if (role === "admin") {
 
     sidebarcontent =
       <>
@@ -89,7 +87,7 @@ export function SidebarContent(props) {
         </li>
       </>
   }
-  if (role == "manager") {
+  if (role === "manager") {
     sidebarcontent = <>
       <li>
         <NavLink
@@ -133,7 +131,7 @@ export function SidebarContent(props) {
       </li>
     </>
   }
-  if (role == "employee") {
+  if (role === "employee") {
     sidebarcontent = <>
       <li>
         <NavLink

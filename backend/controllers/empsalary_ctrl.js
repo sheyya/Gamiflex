@@ -27,7 +27,7 @@ export const createEmpSalary = async (req, res) => {
             return
         });
     } catch (err) {
-        // Implement logger function (winston)
+        console.log(err);
         return res.status(500).json({
             message: "Unable to create empsalary.",
             success: false
@@ -44,8 +44,6 @@ export const getEmpSalarys = function (req, res, next) {
                     message: "No empsalarys data availble",
                 });
             } else {
-                // console.log(user);
-
                 return res.status(200).json({
                     success: true,
                     code: 200,
@@ -63,7 +61,6 @@ export const getEmpSalarys = function (req, res, next) {
 
 // update empsalaryType
 export const updateEmpSalary = async (req, res, next) => {
-    // console.log(req.query.id);
     let query = { _id: req.query.id }
     EmpSalary.findOne(query).exec().then(found_empsalary => {
         if (found_empsalary < 1) {
@@ -71,7 +68,6 @@ export const updateEmpSalary = async (req, res, next) => {
                 message: "No empsalaryType data found",
             });
         } else {
-
             if (req.body.employee_id) { found_empsalary.employee_id = req.body.employee_id }
             if (req.body.salary) { found_empsalary.salary = req.body.salary }
             if (req.body.epf) { found_empsalary.epf = req.body.epf }
@@ -93,7 +89,6 @@ export const updateEmpSalary = async (req, res, next) => {
                 });
 
             })
-
         }
 
     }).catch((err) => {

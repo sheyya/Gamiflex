@@ -3,7 +3,7 @@ import * as React from "react";
 import { Header } from "./Header";
 import { Sidebar } from "./sidebar";
 
-
+//Function to render main layout to load components
 export function Layout(props) {
   return (
     <React.Fragment>

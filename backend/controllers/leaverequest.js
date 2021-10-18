@@ -1,13 +1,13 @@
 
 import LeaveReq from '../models/leaverequest_model.js';
+import { global_search } from '../config/global_search.js'
+import { getPagination, getPagingData } from '../config/pagination.formatter.js'
 
 //create leaveReq
 export const createLeaveReq = async (req, res) => {
     try {
         const lrqDetails = req.body;
-        // console.log(req.body);
         const newLeaveReq = new LeaveReq(lrqDetails);
-
 
         await newLeaveReq.save(function (err) {
             if (err) {
@@ -18,7 +18,6 @@ export const createLeaveReq = async (req, res) => {
                 });
                 return
             }
-
             res.status(201).json({
                 message: "LeaveReq successfully registred!",
                 success: true
@@ -26,7 +25,6 @@ export const createLeaveReq = async (req, res) => {
             return
         });
     } catch (err) {
-        // Implement logger function (winston)
         return res.status(500).json({
             message: "Unable to create leaveReq.",
             success: false
@@ -35,20 +33,30 @@ export const createLeaveReq = async (req, res) => {
 };
 
 //get all leaveReqs
-export const getLeaveReqs = function (req, res, next) {
-    LeaveReq.find({}).
+export const getLeaveReqs = async function (req, res, next) {
+
+    const { page, size, search } = req.query;
+    const { limit, offset } = getPagination(page, size);
+
+
+    //global search
+    let columns = ["employee_id.fname", "reason", "approved_manager", "status", "dateRange",]
+    let where = search ? global_search(columns, search) : {};
+    let pageCount = await LeaveReq.find(where);
+    let all_data = LeaveReq.find(where).sort({ created_at: -1 }).skip(offset).limit(limit);
+
+    all_data.
         populate({ path: 'employee_id', select: 'member_id fname department' }).exec().then((user) => {
             if (user.length < 1) {
                 return res.status(402).json({
                     message: "No leaveReqs data availble",
                 });
             } else {
-                // console.log(user);
 
                 return res.status(200).json({
                     success: true,
                     code: 200,
-                    data: user,
+                    ...getPagingData(user, page, limit, pageCount.length),
                 });
             }
         })
@@ -69,7 +77,6 @@ export const updateLeaveReq = async (req, res, next) => {
                 message: "No leaveReqType data found",
             });
         } else {
-
             if (req.body.employee_id) { found_leaveReq.employee_id = req.body.employee_id }
             if (req.body.reason) { found_leaveReq.reason = req.body.reason }
             if (req.body.approved_manager) { found_leaveReq.approved_manager = req.body.approved_manager }
@@ -87,9 +94,7 @@ export const updateLeaveReq = async (req, res, next) => {
                     code: 200,
                     data: updated_object,
                 });
-
             })
-
         }
 
     }).catch((err) => {
@@ -117,7 +122,6 @@ export const getLeaveReqByid = (req, res, next) => {
                 data: leaveReq,
             });
         }
-
     }).catch((err) => {
         console.log(err);
         res.status(500).json({
@@ -128,8 +132,6 @@ export const getLeaveReqByid = (req, res, next) => {
 
 //get filtered leaveReqs by employee
 export const getLeaveReqsByEmp = (req, res, next) => {
-    // console.log(req.query.id);
-    // console.log("tt");
 
     let query = {
         path: 'employee_id',

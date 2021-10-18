@@ -1,9 +1,6 @@
 import React from "react";
 import { useState, useEffect } from 'react'
-import {
-    Collapse
-} from "reactstrap";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import "./leaderboard.scoped.scss"
 import { message } from "antd";
 import Admin from "../../controllers/admin";
@@ -11,65 +8,47 @@ import Tsk from "../../controllers/task";
 import jwt from 'jwt-decode';
 import moment from "moment"
 import useAuth from "../../useAuth";
+
 /*
 Filter Modes : 
 0 : No Filter
 1 : Search
-2 : Advance Filter
 */
 
 export const Leaderbord = () => {
+    //get current user data
     const { user } = useAuth();
-    const location = useLocation();
     const userdatatk = localStorage.getItem('usertoken');
     let role = user.role || jwt(userdatatk).role;
-    let userid = jwt(userdatatk).user_id
-    let mngr_mid;
+
+    //get current url location of application
+    const location = useLocation();
+
+    //state variable to store today target count data
     const [udata, setUData] = useState([]);
+
+    //state variable to store sorted daily marks
     const [newudata, setNewUData] = useState([]);
+
+    //state variable to store sorted monthly marks
     const [monthudata, setMonthUData] = useState([]);
 
-
+    //function call when page loads at first.
     useEffect(() => {
         loadAllEmployees();
-        // let urldata = window.location.pathname.split("/");
-        // let req_id = urldata[urldata.length - 1];
-        // console.log(urldata[urldata.length - 2]);
-        // userid = jwt(userdatatk).user_id
-        // role == "admin" || role == "manager" ? mngr_mid = jwt(userdatatk).member_id : mngr_mid = "";
-        // console.log(role);
-
-        // if (role == "admin") {
-        //     getempcount();
-        //     getmngrcount();
-        //     gettaskscount();
-        //     gettargetcount();
-        // }
-        // else if (role == "manager") {
-        //     getempcount();
-        //     console.log(getempcount());
-        //     gettaskscount();
-        //     gettargetcount();
-        // }
-        // else if (role == "employee") {
-        //     gettaskscountbyemp({ id: userid });
-        //     gettargetcountbyemp({ id: userid })
-        // }
-
     }, [location]);
+
+    //key value to show toast messages on screen
     const key = 'loading';
 
+    //sort function to call when udata is updated
     useEffect(() => {
-        console.log("ll", udata);
-
+        //fuction to sort the array
         const sortArray = () => {
             const sorted = udata.sort((a, b) => b.marks - a.marks);
             setNewUData(sorted);
         };
-
         sortArray();
-        console.log(newudata);
-
     }, [udata]);
 
     //getall employees
@@ -77,14 +56,15 @@ export const Leaderbord = () => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         Admin.getAllEmployees(params)
             .then(async (result) => {
-                console.log("wait");
-
+                //store employee data
                 const rdata = result.data;
-                console.log(rdata);
+
+                //initalize state variables
                 setUData([])
                 setMonthUData([])
-                rdata.map((item) => {
 
+                //loop employee data to retrive relavant data and append to state variables
+                rdata.forEach((item) => {
                     Tsk.getTargetCountTodaybyEmp({ id: item._id }).then(async (result) => {
                         const out = result.data
                         const dataMapped = out.map((data) => {
@@ -101,21 +81,18 @@ export const Leaderbord = () => {
                                 }
                             )
                         })
-                        console.log("aa");
-
+                        //sort employee target data according to marks DSC
                         dataMapped.sort((a, b) => b.marks - a.marks);
-
+                        //Store sorted array on state variable
                         setUData(prevState => ([...prevState, ...dataMapped]))
-                        console.log("ddjk", udata);
-
                     })
                         .catch((err) => {
                             console.log(err);
                             message.warning({ content: 'No Daily Data Found!', key, duration: 2 });
                         });
-
                 })
 
+                //loop employee data to get monthly marks 
                 const mdata = rdata.map((item) => {
                     return (
                         {
@@ -126,15 +103,14 @@ export const Leaderbord = () => {
                         }
                     )
                 })
+                //sort monthly marks
                 await mdata.sort((a, b) => b.marks - a.marks);
+                //store monthly marks on state variable
                 setMonthUData(prevState => ([...prevState, ...mdata]))
-
-
             })
             .catch((err) => {
                 message.warning({ content: 'No Data Found!', key, duration: 2 });
             })
-
     }
 
 
@@ -142,27 +118,6 @@ export const Leaderbord = () => {
     return (
         <div className="leaderboard">
             <div className="l-grid">
-                {/* {role == "employee" ? <div className="l-grid__item l-grid__item--sticky">
-                    <div className="c-card u-bg--light-gradient u-text--dark">
-                        <div className="c-card__body">
-                            <div className="u-display--flex u-justify--space-between">
-                                <div className="u-text--left">
-                                    <div className="u-text--small ">My Rank</div>
-                                    <h2 >3rd Place</h2>
-                                </div>
-                                <div className="u-text--right">
-                                    <div className="u-text--small " >My Score</div>
-                                    <h2>24</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="c-card">
-                        <div className="c-card__body">
-                            <div className="u-text--center" id="winner"></div>
-                        </div>
-                    </div>
-                </div> : <></>} */}
                 <div className="l-grid__item">
                     <div className="c-card">
                         <div className="c-card__header">
@@ -181,10 +136,10 @@ export const Leaderbord = () => {
                                     </div>
                                 </li>
                                 {
-
                                     newudata.map((userd, index) => {
                                         let newclassrank = "c-flag c-place u-bg--transparent";
                                         let newclassmarks = "u-text--right c-kudos";
+                                        // Give Special colors to first 3 employees
                                         if (index + 1 === 1) {
                                             newclassrank = 'c-flag c-place u-text--dark u-bg--yellow'
                                             newclassmarks = 'u-text--right c-kudos u-text--yellow'
@@ -223,7 +178,7 @@ export const Leaderbord = () => {
                         <div className="c-card__header">
                             <h3 style={{ color: "#ffffff" }}>Monthly Leaderboard</h3>
                             <select className="c-select">
-                                <option selected="selected">{moment().format("DD MMM YYYY")}</option>
+                                <option selected="selected">{moment().format("MMM YYYY")}</option>
                             </select>
                         </div>
                         <div className="c-card__body">
@@ -257,7 +212,7 @@ export const Leaderbord = () => {
                                                     <div className="c-media">
                                                         <div className="c-media__content">
                                                             <div className="c-media__title">{userd.name}</div>
-                                                            <a className="c-media__link u-text--small" href={role == "admin" || "manager" ? `/dashboard/employee/view/${userd.id}` : ""} >{userd.member_id}</a>
+                                                            <a className="c-media__link u-text--small" href={role === "admin" || "manager" ? `/dashboard/employee/view/${userd.id}` : ""} >{userd.member_id}</a>
                                                         </div>
                                                     </div>
                                                     <div className={newclassmarks}>

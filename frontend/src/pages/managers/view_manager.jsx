@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { AvForm, AvField, AvInput } from "availity-reactstrap-validation";
-import { Link, RouteComponentProps, useLocation } from "react-router-dom";
+import { AvForm, AvField } from "availity-reactstrap-validation";
+import { useLocation } from "react-router-dom";
 import "./users.scss";
 import {
     Row,
@@ -16,13 +16,7 @@ import {
     DropdownItem,
     DropdownMenu,
     DropdownToggle,
-    Modal,
-    ModalBody,
-    ModalHeader,
-    Table,
-    UncontrolledTooltip,
 } from "reactstrap";
-import logodark from "../../assets/images/logo-dark.png";
 import Admin from "../../controllers/admin";
 import { message } from "antd";
 
@@ -34,8 +28,6 @@ const Manager = (props) => {
     const toggleDropdownGroup = () => setDropdownOpenGroup((prevState) => !prevState);
     const toggleDropdownWallet = () => setDropdownOpenWallet((prevState) => !prevState);
     const location = useLocation();
-    let data = [];
-
     const [userdata, setuserData] = useState({
         username: "",
         pass: "",
@@ -54,12 +46,8 @@ const Manager = (props) => {
         nominee: "",
         member_id: "",
         role: ""
-
     });
-    const [enableEdit, setEnableEdit] = useState(false);
-    // const [isAlertOpen, setIsAlertOpen] = useState(false);
-
-
+    const [enableEdit, setEnableEdit] = useState(false);;
 
     //handle input changes
     const handleChange = (e) => {
@@ -68,23 +56,17 @@ const Manager = (props) => {
             ...userdata,
             [e.target.name]: value,
         });
-        console.log(userdata);
-
     };
 
     useEffect(() => {
-        // const userid = location.state.id;
-        // const isEdit = location.state.edit;
         let urldata = window.location.pathname.split("/");
         let userid = urldata[urldata.length - 1];
-        console.log(urldata[urldata.length - 2]);
 
         loadManager(userid)
 
         if (urldata[urldata.length - 2] === "edit") {
             setEnableEdit(true);
         }
-
     }, [location]);
 
 
@@ -98,7 +80,6 @@ const Manager = (props) => {
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const data = result.data;
-                console.log(data);
                 setuserData(
                     {
                         id: data._id,
@@ -123,11 +104,10 @@ const Manager = (props) => {
             })
             .catch((err) => {
                 console.log(err);
-
             })
     };
 
-
+    // Function to update manager details
     const updateManager = async () => {
         message.loading({ content: 'Updating User...', key, duration: 0 })
         if (
@@ -151,20 +131,12 @@ const Manager = (props) => {
                     message.success({ content: 'Data Updated Successfully', key, duration: 2 }).then(() => {
                         props.history.push('/dashboard/managers/')
                     })
-
-                }).catch(err => {
-                    console.log(err);
-
-                })
+                }).catch(err => { console.log(err); })
             } else {
-                console.log(userdata);
-
                 message.error({ content: "Passwords needs to be same", key, duration: 2 });
                 console.log("Error");
             }
         } else {
-            console.log(userdata);
-
             message.error({ content: "Please fill all fields", key, duration: 2 });
             console.log("Error");
         }
@@ -176,7 +148,6 @@ const Manager = (props) => {
             <div className="page-content">
                 <Container fluid={true}>
                     <Row>
-
                         <Row>
                             <div className="page-title-box">
                                 <h4 className="mb-0">
@@ -370,26 +341,28 @@ const Manager = (props) => {
                                                         </FormGroup>
                                                     </Col>
                                                 </Row>
-                                                <Row>
-                                                    <Col lg="6">
-                                                        <FormGroup>
-                                                            <Label for="username">Username</Label>
-                                                            {enableEdit ? (
-                                                                <Input
-                                                                    type="text"
-                                                                    className="form-control"
-                                                                    defaultValue={userdata.username}
-                                                                    onChange={handleChange}
-                                                                    id="username"
-                                                                    name="username"
-                                                                />
-                                                            ) : (
-                                                                    <p>{userdata.username}</p>
-                                                                )}
-                                                        </FormGroup>
-                                                    </Col>
-                                                    <Col lg="6">
-                                                        <AvForm>
+                                                <AvForm>
+                                                    <Row>
+                                                        <Col lg="6">
+                                                            <FormGroup>
+                                                                <Label for="username">Username</Label>
+                                                                {enableEdit ? (
+                                                                    <Input
+                                                                        type="text"
+                                                                        className="form-control"
+                                                                        defaultValue={userdata.username}
+                                                                        onChange={handleChange}
+                                                                        id="username"
+                                                                        name="username"
+                                                                    />
+                                                                ) : (
+                                                                        <p>{userdata.username}</p>
+                                                                    )}
+                                                            </FormGroup>
+                                                        </Col>
+
+                                                        <Col lg="6">
+
                                                             <Label for="password">Password</Label>
                                                             {enableEdit ? (
                                                                 <AvField
@@ -413,16 +386,13 @@ const Manager = (props) => {
                                                             ) : (
                                                                     <p>**********</p>
                                                                 )}
-                                                        </AvForm>
-                                                    </Col>
-                                                </Row>
-                                                <Row>
-                                                    <Col lg="6">
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col lg="6">
 
-                                                    </Col>
-                                                    <Col lg="6">
-                                                        <AvForm>
-                                                            <Label>⠀</Label>
+                                                        </Col>
+                                                        <Col lg="6">
                                                             {enableEdit ? (
                                                                 <>
                                                                     <Label for="confirm-password">Confirm Password</Label>
@@ -447,10 +417,10 @@ const Manager = (props) => {
                                                             ) : (
                                                                     <p>⠀</p>
                                                                 )}
-                                                        </AvForm>
-                                                    </Col>
 
-                                                </Row>
+                                                        </Col>
+                                                    </Row>
+                                                </AvForm>
                                             </Col>
                                         </Row>
                                     </div>
@@ -559,7 +529,6 @@ const Manager = (props) => {
                             </Card>
                         </Col>
                     </Row>
-
                 </Container>
             </div>
         </React.Fragment>

@@ -14,7 +14,6 @@ const userAuth = passport.authenticate("jwt", { session: false });
 const checkRole = roles => (req, res, next) => {
     if (!roles.includes(req.user.role)) {
         res.status(401).json("Unauthorized");
-        // console.log("Unauthorised");
         return;
     } else next();
 }
@@ -22,7 +21,7 @@ const checkRole = roles => (req, res, next) => {
 
 //=========employee salary===========
 router.get('/empsalary', userAuth, checkRole(["admin"]), empSalaryController.getEmpSalarys);
-router.get('/empsalarybyemp', userAuth, checkRole(["admin"]), empSalaryController.getEmpSalarysByEmp);
+router.get('/empsalarybyemp', userAuth, checkRole(["admin", "employee"]), empSalaryController.getEmpSalarysByEmp);
 router.post('/empsalary', userAuth, checkRole(["admin"]), empSalaryController.createEmpSalary);
 router.get('/empsalary/:id', userAuth, checkRole(["admin"]), empSalaryController.getEmpSalaryByid);
 router.patch('/empsalary', userAuth, checkRole(["admin"]), empSalaryController.updateEmpSalary);

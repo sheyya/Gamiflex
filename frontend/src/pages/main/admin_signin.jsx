@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import {
   Row,
   Col,
-  Input,
   Button,
   Alert,
   Container,
   Label,
   FormGroup,
 } from "reactstrap";
-import { Link, RouteComponentProps } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AvForm, AvField } from "availity-reactstrap-validation";
 import Admin from "../../controllers/admin";
 import { withRouter } from 'react-router-dom'
+
 // import images
 import logodark from "../../assets/images/logo-dark.png";
 import welcome from "../../assets/images/welcome.png";
@@ -37,16 +37,12 @@ const Admin_Signin = () => {
   //On submit button
   const onLogin = async (e) => {
     e.preventDefault();
-
     //call login controller function
     var status = await loginUser(Admin,
       usernameval,
       passval
     );
-    console.log(status);
-
     switch (status) {
-
       // user not found
       case 404:
         await setError(
@@ -58,7 +54,6 @@ const Admin_Signin = () => {
         setError("Please check your network connection");
         return -1;
     }
-
   }
 
   return (
@@ -88,11 +83,7 @@ const Admin_Signin = () => {
 
                                 <h4 className="font-size-18 mt-2 badge text-dark bg-gami">Admin Login</h4>
                               </div>
-
                               {error ? <Alert color="danger">{error}</Alert> : null}
-
-
-
                               <div className="p-2 mt-3">
                                 <AvForm
                                   className="form-horizontal"
@@ -129,21 +120,6 @@ const Admin_Signin = () => {
                                       placeholder="Enter password"
                                     />
                                   </FormGroup>
-
-                                  {/* <div className="custom-control custom-checkbox">
-                              <Input
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="customControlInline"
-                              />
-                              <Label
-                                className="custom-control-label"
-                                htmlFor="customControlInline"
-                              >
-                                Remember me
-                              </Label>
-                            </div> */}
-
                                   <div className="mt-4 text-center">
                                     <Button
                                       className="w-50 waves-effect bg-gami waves-light"
@@ -153,16 +129,6 @@ const Admin_Signin = () => {
                                       {loading ? <span className="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> : "Log In"}
                                     </Button>
                                   </div>
-
-                                  {/* <div className="mt-4 text-center">
-                              <Link
-                                to="/forgot-password"
-                                className="text-muted"
-                              >
-                                <i className="mdi mdi-lock mr-1"></i> Forgot
-                                your password?
-                              </Link>
-                            </div> */}
                                 </AvForm>
                               </div>
                             </div>

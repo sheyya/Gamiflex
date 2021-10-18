@@ -15,6 +15,9 @@ export default (passport) => {
     try {
         passport.use(
             new Strategy(opts, async (payload, done) => {
+
+                // Validate user using database corresponding to the user role
+
                 if (payload.role === "admin") {
                     await Admin.findById(payload.user_id).then(user => {
                         if (user) {
