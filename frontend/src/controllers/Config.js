@@ -5,9 +5,9 @@ class Config {
   constructor() {
     //backend server details
     // https://gamiflex-server.tinykiddies.com/
-    this.host = "http://localhost";
+    this.host = "https://gamiflex-server.tinykiddies.com/";
 
-    this.port = ":5000/";
+    this.port = "";
   }
 
 }
