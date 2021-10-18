@@ -225,7 +225,7 @@ export const Tasks = (props) => {
         }).catch((err) => { console.log(err); })
 
         await Admin.getAllManagers().then((result) => {
-            const data = result.managers;
+            const data = result.data;
             setGetDataM(data.map((item) => {
                 return (
                     {
@@ -272,11 +272,12 @@ export const Tasks = (props) => {
 
     //getall tasks by employee
     const loadtaskbyemp = (params) => {
-        let userid2 = jwt(userdatatk).user_id
-        params.id = userid2
+        let userida = jwt(userdatatk).user_id
+        params.id = userida
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         Task.getTaskByEmployee(params)
             .then((result) => {
+                setMeta(result.meta);
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
                 setData(rdata.map((item) => {

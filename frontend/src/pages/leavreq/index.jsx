@@ -170,16 +170,32 @@ export const LeaveReqs = (props) => {
 
     const deleteLeaveReqs = (params) => {
         message.loading({ content: 'Deleting...', key, duration: 0 })
-        LeaveReq.deleteLeaveReq(params)
-            .then((result) => {
-                message.success({ content: 'Deleted!', key, duration: 1 }).then(() => {
-                    props.history.push('/dashboard/leaverequests')
-                })
+        // get index of deleting leave request
+        let delindex = data.map((req, index) => {
+            if (req.id === params) {
+                return index;
+            }
+        })
+        console.log(delindex);
 
-            })
-            .catch((err) => {
-                message.error({ content: 'Error Occured!', key, duration: 2 });
-            })
+        // get status of leave request
+        let cStatus = data[delindex].status;
+
+        if (cStatus == "pending") {
+            LeaveReq.deleteLeaveReq(params)
+                .then((result) => {
+                    message.success({ content: 'Deleted!', key, duration: 1 }).then(() => {
+                        props.history.push('/dashboard/leaverequests')
+                    })
+
+                })
+                .catch((err) => {
+                    message.error({ content: 'Error Occured!', key, duration: 2 });
+                })
+        }
+        else {
+            message.error({ content: 'Cannot delete approved or rejected requests!', key, duration: 2 });
+        }
     };
 
 
@@ -191,7 +207,6 @@ export const LeaveReqs = (props) => {
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
-                console.log(rdata);
                 setMeta(result.meta);
                 setData(rdata.map((item) => {
                     const createdate = moment(item.created_at).format('YY MMM DD - HH:mm')
@@ -200,7 +215,6 @@ export const LeaveReqs = (props) => {
                     else {
                         apprmngr = 'Not available'
                     }
-                    console.log(item.employee_id);
 
                     return (
                         {
@@ -228,13 +242,11 @@ export const LeaveReqs = (props) => {
     //getall leavereqs by employee
     const loadleavereqbyemp = (params) => {
         message.loading({ content: 'Data Loading...', key, duration: 0 })
-        console.log(params);
 
         LeaveReq.getLeaveReqByEmployee({ id: params })
             .then((result) => {
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
-                console.log(rdata);
 
                 setData(rdata.map((item) => {
                     const creatdate = moment(item.created_at).format('YY MMM DD - HH:mm')
@@ -243,8 +255,6 @@ export const LeaveReqs = (props) => {
                     else {
                         apprmngr = 'Not available'
                     }
-
-                    console.log(item.dateRange[0]);
 
                     return (
                         {

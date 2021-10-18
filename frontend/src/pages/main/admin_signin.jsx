@@ -53,6 +53,13 @@ const Admin_Signin = () => {
       case 600:
         setError("Please check your network connection");
         return -1;
+      case true:
+        //success redirect
+        window.location.replace('/dashboard/overview')
+        break;
+      default:
+        setError("check username or password")
+        return -1;
     }
   }
 

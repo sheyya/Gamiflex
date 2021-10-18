@@ -59,6 +59,9 @@ const Manager_Signin = () => {
         //  history.push('/dashboard/overview') 
         window.location.replace('/dashboard/overview/mngr')
         break;
+      default:
+        setError("check username or password")
+        return -1;
     }
   }
 

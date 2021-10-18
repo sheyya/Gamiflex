@@ -59,6 +59,9 @@ const Employee_Signin = () => {
         //success redirect
         window.location.replace('/dashboard/overview/emp')
         break;
+      default:
+        setError("check username or password")
+        return -1;
     }
   }
 

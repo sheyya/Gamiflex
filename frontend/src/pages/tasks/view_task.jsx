@@ -142,7 +142,7 @@ const Task = (props) => {
             }).catch((err) => { console.log(err); })
 
         await Admin.getAllManagers().then((result) => {
-            const data = result.managers;
+            const data = result.data;
             setGetDataM(data.map((item) => {
                 return (
                     {
