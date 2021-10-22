@@ -29,6 +29,7 @@ const Task = (props) => {
 
     const [taskdata, setTaskData] = useState({
         task_name: "",
+        task_type: "",
         department: "",
         assignee: "",
         assignee_name: "",
@@ -86,7 +87,7 @@ const Task = (props) => {
     const handleTaskTypeChange = (value) => {
         setTaskData(
             {
-                ...taskdata, task_name: value
+                ...taskdata, task_name: value, task_type: value
             }
         )
     }
@@ -134,7 +135,7 @@ const Task = (props) => {
                 setGetDataT(data.map((item) => {
                     return (
                         {
-                            value: `${item.department} - ${item.main_product} - ${item.sub_product}`,
+                            value: item._id,
                             name: `${item.department} - ${item.main_product} - ${item.sub_product}`,
                         }
                     )
@@ -196,6 +197,8 @@ const Task = (props) => {
         ) {
             if (taskdata.target === taskdata.completed) { taskdata.status = "completed" }
             if (taskdata.target < taskdata.completed) { taskdata.status = "over target" }
+            console.log(taskdata);
+
             Tasks.updateTasks(taskdata).then((response) => {
                 message.success({ content: 'Data Updated Successfully', key, duration: 2 }).then(() => {
                     props.history.push('/dashboard/tasks/')

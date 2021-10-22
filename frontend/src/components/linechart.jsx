@@ -142,12 +142,16 @@ export function Linechart({ empid }) {
 
     // Function to get anomaly points
     const getanaompoints = (senddata) => {
+        console.log(senddata);
+
         AzAnomaly.getAnomaly(senddata).then(async (points) => {
             if (points.length < 0) {
                 console.log("no anomaly");
             }
             else {
                 let rdata = points.data;
+                console.log(points);
+
                 pdata = rdata.map((point) => {
                     return (
                         {

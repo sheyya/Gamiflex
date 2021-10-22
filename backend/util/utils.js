@@ -30,6 +30,8 @@ export const targetCountTodayByEmp = async (data) => {
     let retdata;
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // var startOfToday = new Date(moment.tz("2021-10-20", "Asia/Colombo").format());
+    // var endOfToday = new Date(moment.tz("2021-10-21", "Asia/Colombo").format());
 
     var query = Task.aggregate([
         { $match: { created_at: { $gte: startOfToday }, assignee: mongoose.Types.ObjectId(data) } },
@@ -45,7 +47,6 @@ export const targetCountTodayByEmp = async (data) => {
     });
     return retdata
 };
-
 
 // update manager
 export const updateEmployee = async (data) => {
@@ -85,7 +86,6 @@ export const updateEmployee = async (data) => {
     });
 }
 
-
 //get filtered empsalarys by employee
 export const getEmpSalarysByEmp = async (data) => {
     let query = {
@@ -112,8 +112,6 @@ export const getEmpSalarysByEmp = async (data) => {
     });
     return retdata;
 }
-
-
 
 // update empsalaryType
 export const updateEmpSalary = async (data) => {
@@ -190,7 +188,6 @@ export const updateEmpSalary = async (data) => {
     });
 }
 
-
 //create empsalary
 export const createEmpSalary = async (data) => {
     try {
@@ -236,16 +233,15 @@ export const createMarkslog = async (data) => {
     }
 };
 
-
 //create total targets completed
 export const createTotTC = async (data) => {
     let totdata;
     try {
         var now = new Date();
         var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        // var startOfToday = new Date(2021, 8, 15);
-        // var endOfToday = new Date(2021, 8, 16);
-        console.log(startOfToday);
+        // var startOfToday = new Date(moment.tz("2021-10-20", "Asia/Colombo").format());
+        // var endOfToday = new Date(moment.tz("2021-10-21", "Asia/Colombo").format());
+        // console.log(startOfToday);
         var query = Task.aggregate([
             { $match: { created_at: { $gte: startOfToday } } },
             { $group: { _id: null, targetot: { $sum: "$target" }, completedtot: { $sum: "$completed" } } }

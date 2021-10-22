@@ -83,7 +83,7 @@ export const updateTask = async (req, res, next) => {
                 message: "No taskType data found",
             });
         } else {
-            if (req.body.task_name) { found_task.task_name = req.body.task_name }
+            if (req.body.task_type) { found_task.task_type = req.body.task_type }
             if (req.body.department) { found_task.department = req.body.department }
             if (req.body.assignee) { found_task.assignee = req.body.assignee }
             if (req.body.manager) { found_task.manager = req.body.manager }
