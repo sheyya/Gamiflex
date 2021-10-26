@@ -15,7 +15,7 @@ export const MainTable = ({ meta, data = [], handlePageChange, columns = [], act
 
   const initFilters = columns.reduce((a, c) => { a[c.field] = ""; return a; }, { search: "" });
   const [filterMode, setFilterMode] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(35);
   const [currentPage, setCurrentPage] = useState(0);
   const [filters, setFilters] = useState(initFilters)
 

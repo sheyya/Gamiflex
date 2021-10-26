@@ -184,8 +184,10 @@ const Employee = (props) => {
         let userida = urldata[urldata.length - 1];
         message.loading({ content: 'Data Loading...', key, duration: 0 })
         params.id = userida
+        console.log("dhjfjfj", params);
         Task.getTaskByEmployee(params)
             .then((result) => {
+
                 setMeta(result.meta);
                 message.success({ content: 'Loaded!', key, duration: 2 });
                 const rdata = result.data;
@@ -202,7 +204,7 @@ const Employee = (props) => {
                             manager: item.manager.member_id,
                             target: item.target,
                             completed: item.completed,
-                            status: item.status === "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : <div className="badge badge-soft-warning font-size-14">{item.status}</div>,
+                            status: item.status === "completed" ? <div className="badge badge-soft-success font-size-14">{item.status}</div> : item.status === "ongoing" ? <div className="badge badge-soft-warning font-size-14">{item.status}</div> : item.status === "expired" ? <div className="badge badge-soft-secondary font-size-14">{item.status}</div> : <div className="badge badge-soft-info font-size-14">{item.status}</div>,
                             deadline: deaddate,
                             updated_at: udate
                         }
@@ -210,6 +212,7 @@ const Employee = (props) => {
                 }))
             })
             .catch((err) => {
+                message.warning({ content: 'No Data!', key, duration: 1 })
                 console.log(err);
             })
     }
@@ -251,9 +254,15 @@ const Employee = (props) => {
             message.error({ content: 'Something Went Wrong!', key, duration: 2 })
         }).finally(() => {
             // Finaly calculating salary using task data
+            console.log(startOfMonth);
+            console.log(endOfMonth);
+
             tasksData.map((item) => {
+
                 //get salary for completed tasks in current month
                 if (moment(item.deadline).isBetween(startOfMonth, endOfMonth)) {
+                    console.log("tsk data", item);
+
                     cs += item.task_type.price * item.completed;
                 } else {
                     console.log(0);
