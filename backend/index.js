@@ -160,7 +160,7 @@ const dailylog = () => {
     }).catch((err) => {
         console.log(err);
     }).finally(
-        utils.anomalyNotify()
+        // utils.anomalyNotify()
     )
 }
 

@@ -172,14 +172,15 @@ export const LeaveReqs = (props) => {
         message.loading({ content: 'Deleting...', key, duration: 0 })
         // get index of deleting leave request
         let delindex = data.map((req, index) => {
-            if (req.id === params) {
+
+            if (req.id == params) {
                 return index;
             }
-        })
-        console.log(delindex);
+        }).filter(item => typeof item !== 'undefined');;
 
         // get status of leave request
-        let cStatus = data[delindex].status;
+        let indval = delindex[0];
+        let cStatus = data[indval].status.props.children;
 
         if (cStatus == "pending") {
             LeaveReq.deleteLeaveReq(params)

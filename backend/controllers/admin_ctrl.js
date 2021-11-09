@@ -217,7 +217,7 @@ export const updateEmployee = async (req, res, next) => {
     let pass;
     let query = { _id: req.params.id }
 
-    if (req.body.username) {
+    if (req.body.username && req.body.pass) {
         pass = await bcrypt.hash(req.body.pass, 12);
     }
     Employee.findOne(query).exec().then(found_employee => {
@@ -228,7 +228,7 @@ export const updateEmployee = async (req, res, next) => {
         } else {
 
             if (req.body.username) { found_employee.username = req.body.username }
-            if (req.body.password) { found_employee.password = pass }
+            if (req.body.pass) { found_employee.password = pass }
             if (req.body.fname) { found_employee.fname = req.body.fname }
             if (req.body.lname) { found_employee.lname = req.body.lname }
             if (req.body.email) { found_employee.email = req.body.email }
@@ -417,7 +417,7 @@ export const getManagers = async function (req, res, next) {
 export const updateManager = async (req, res, next) => {
     let pass;
     let query = { _id: req.params.id }
-    if (req.body.username) {
+    if (req.body.username && req.body.pass) {
         pass = await bcrypt.hash(req.body.pass, 12);
     }
     Manager.findOne(query).exec().then(found_manager => {
@@ -428,7 +428,7 @@ export const updateManager = async (req, res, next) => {
         } else {
 
             if (req.body.username) { found_manager.username = req.body.username }
-            if (req.body.password) { found_manager.password = pass }
+            if (req.body.pass) { found_manager.password = pass }
             if (req.body.fname) { found_manager.fname = req.body.fname }
             if (req.body.lname) { found_manager.lname = req.body.lname }
             if (req.body.email) { found_manager.email = req.body.email }

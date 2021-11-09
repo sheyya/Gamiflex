@@ -368,7 +368,8 @@ const Manager = (props) => {
                                                                 <AvField
                                                                     type="password"
                                                                     className="form-control"
-                                                                    defaultValue={userdata.pass}
+                                                                    // defaultValue={userdata.pass}
+                                                                    autocomplete="new-password"
                                                                     onChange={handleChange}
                                                                     id="password"
                                                                     name="pass"

@@ -30,8 +30,8 @@ export const targetCountTodayByEmp = async (data) => {
     let retdata;
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    // var startOfToday = new Date(moment.tz("2021-10-20", "Asia/Colombo").format());
-    // var endOfToday = new Date(moment.tz("2021-10-21", "Asia/Colombo").format());
+    // var startOfToday = new Date(moment.tz("2021-11-08", "Asia/Colombo").format());
+    // var endOfToday = new Date(moment.tz("2021-11-09", "Asia/Colombo").format());
 
     var query = Task.aggregate([
         { $match: { created_at: { $gte: startOfToday }, assignee: mongoose.Types.ObjectId(data) } },
@@ -239,8 +239,8 @@ export const createTotTC = async (data) => {
     try {
         var now = new Date();
         var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        // var startOfToday = new Date(moment.tz("2021-10-20", "Asia/Colombo").format());
-        // var endOfToday = new Date(moment.tz("2021-10-21", "Asia/Colombo").format());
+        // var startOfToday = new Date(moment.tz("2021-11-08", "Asia/Colombo").format());
+        // var endOfToday = new Date(moment.tz("2021-11-09", "Asia/Colombo").format());
         // console.log(startOfToday);
         var query = Task.aggregate([
             { $match: { created_at: { $gte: startOfToday } } },

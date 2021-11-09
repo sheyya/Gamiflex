@@ -245,6 +245,7 @@ const Employee = (props) => {
                     id = item._id
                 }
                 //get previous month salary
+                console.log(item);
                 if (item.month == moment().subtract(1, 'months').format('MMM YY')) {
                     setPrevSalary(item.salary)
                 }
@@ -534,8 +535,9 @@ const Employee = (props) => {
                                                                 <AvField
                                                                     type="password"
                                                                     className="form-control"
-                                                                    defaultValue={userdata.pass}
+                                                                    // defaultValue={userdata.pass}
                                                                     onChange={handleChange}
+                                                                    autocomplete="new-password"
                                                                     id="password"
                                                                     name="pass"
                                                                     validate={{
